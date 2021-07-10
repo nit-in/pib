@@ -1,0 +1,5 @@
+Scrapy==2.4.1
+scrapy_selenium==0.0.7
+requests==2.25.1
+itemadapter==0.2.0
+pdfkit==0.6.1
