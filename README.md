@@ -17,6 +17,10 @@ pip install -r requirements.txt
 
 #source the env file
 source .env
+
+#if you are using shell other than bash then 
+bash --init-file .env
+
 #run the spider
 pib start_date end_date #(date format: yyyy-mm-dd)
 #example => to download the articles from June 1st, 2021 to June 15th, 2021; use

@@ -51,7 +51,7 @@ class PibSpider(scrapy.Spider):
                 .replace("\n", "_")
             )
             pib_title_re = re.sub(
-                "[`~!@#$%^&*();:',.+=<>|\\/?\n\t\r ]", "", pib_title_un
+                "[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_title_un
             )
             pib_title = pib_title_re + "_" + str(pib_prid) + ".pdf"
             pib_min_un = (
@@ -60,7 +60,7 @@ class PibSpider(scrapy.Spider):
                 .replace("&", "and")
                 .replace("\n", "_")
             )
-            pib_min = re.sub("[`~!@#$%^&*();:',.+=<>|\\/?\n\t\r ]", "", pib_min_un)
+            pib_min = re.sub("[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_min_un)
             pib_prlink = str(pib_url) + str(pib_prid)
             # print(self.pib_date,pib_min,pib_title,pib_prlink,sep="\n",end="\n\n\n")
             self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
