@@ -27,6 +27,7 @@ jobs:
           sudo apt install --fix-missing -y python3 wkhtmltopdf fd-find poppler-utils
           sudo ln -s $(which fdfind) /usr/bin/fd
           sudo pip install -r requirements.txt
+          mkdir -p /home/runner/zips
 
       - name: run script
         run:  |
@@ -41,22 +42,24 @@ jobs:
       - name: zipup_months_articles
         run:  |
           cd /home/runner/pib/${{ env.PIB_YEAR }}
-          zip -r "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+          zip -r "/home/runner/zips/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
 
       - name: zipup_months_articles_by_days
         run:  |
-          cd /home/runner/pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}
-          for day in *; do
-            zip -r "PIB_$day_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day
+          cd /home/runner
+          for day in pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}/*; do
+            echo $day
+            dayname=$(basename $day)
+            zip -r "/home/runner/zips/PIB_$dayname_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day
           done
 
       - name: zipup_text
         run:  |
           cd /home/runner/pib_text/${{ env.PIB_YEAR }}
-          zip -r "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+          zip -r "/home/runner/zips/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "/home/runner/pib/${{ env.PIB_YEAR }}/*.zip, /home/runner/pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}/*.zip, /home/runner/pib_text/${{ env.PIB_YEAR }}/*.zip"
+          artifacts: "/home/runner/zips/*.zip"
           token: ${{ secrets.PIB }}
