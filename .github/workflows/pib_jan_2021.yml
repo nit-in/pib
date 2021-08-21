@@ -38,45 +38,25 @@ jobs:
           source .env
           pdftxt
 
-      - name: zipup_articles
+      - name: zipup_months_articles
         run:  |
           cd /home/runner/pib/${{ env.PIB_YEAR }}
-          zip -r "/home/runner/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+          zip -r "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+
+      - name: zipup_months_articles_by_days
+        run:  |
+          cd /home/runner/pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}
+          for day in *; do
+            zip -r "PIB_$day_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day
+          done
 
       - name: zipup_text
         run:  |
           cd /home/runner/pib_text/${{ env.PIB_YEAR }}
-          zip -r "/home/runner/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+          zip -r "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
 
       - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PIB }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-      - name: Upload articles zip
-        id: upload-release-asset-articles
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PIB }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
-          asset_name: PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload articles text zip
-        id: upload-release-asset-articles-text
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PIB }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
-          asset_name: PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
-          asset_content_type: application/zip 
+          artifacts: "/home/runner/pib/${{ env.PIB_YEAR }}/*.zip, /home/runner/pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}/*.zip, /home/runner/pib_text/${{ env.PIB_YEAR }}/*.zip"
+          token: ${{ secrets.PIB }}
