@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v2021_Aug'
+  schedule:
+    - cron: '0 3 * 8 *'
 
   workflow_dispatch:
 
