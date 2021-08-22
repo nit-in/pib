@@ -50,7 +50,7 @@ jobs:
           for day in pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}/*; do
             echo $day
             dayname=$(basename $day)
-            zip -r "/home/runner/zips/PIB_$dayname_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day
+            zip -r "/home/runner/zips/PIB_${dayname}_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day
           done
 
       - name: zipup_text
