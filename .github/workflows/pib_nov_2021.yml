@@ -5,7 +5,7 @@ on:
     tags:
       - 'v2021_Nov'
   schedule:
-    - cron: '0 3 * 11 *'
+    - cron: '0 15 * 11 *'
 
   workflow_dispatch:
 
@@ -65,3 +65,4 @@ jobs:
         with:
           artifacts: "/home/runner/zips/*.zip"
           token: ${{ secrets.PIB }}
+          tag: "v2021_Nov"

@@ -5,7 +5,7 @@ on:
     tags:
       - 'v2021_Aug'
   schedule:
-    - cron: '0 3 * 8 *'
+    - cron: '0 15 * 8 *'
 
   workflow_dispatch:
 
@@ -65,3 +65,4 @@ jobs:
         with:
           artifacts: "/home/runner/zips/*.zip"
           token: ${{ secrets.PIB }}
+          tag: "v2021_Aug"
