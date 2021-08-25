@@ -66,3 +66,5 @@ jobs:
           artifacts: "/home/runner/zips/*.zip"
           token: ${{ secrets.PIB }}
           tag: "v2021_Nov"
+          allowUpdates: true
+          body : "PIB artilces for the month of November 2021"
