@@ -67,4 +67,4 @@ jobs:
           token: ${{ secrets.PIB }}
           tag: "v2021_Aug"
           allowUpdates: true
-          body : "PIB artilces for the month of August 2021"
+          body : "PIB articles for the month of August 2021"
