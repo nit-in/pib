@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 import pdfkit
 import re
+import platform
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
 url = "https://pib.gov.in/AllRelease.aspx"
@@ -12,7 +13,8 @@ pib_url = "https://pib.gov.in/PressReleaseIframePage.aspx?PRID="
 cwd = Path.cwd()
 chromedriver = "selenium/chromedriver"
 chromedriver_path = Path(cwd, chromedriver).expanduser()
-
+platform_release = str(platform.release())
+today = datetime.today()
 
 class PibSpider(scrapy.Spider):
     name = "pib"
@@ -26,17 +28,21 @@ class PibSpider(scrapy.Spider):
     def start_requests(self):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
-        self.rel_day = self.strp_date.strftime("%d")
-        self.rel_month = self.strp_date.strftime("%m")
-        self.rel_year = self.strp_date.strftime("%Y")
-        self.pib_date = self.strp_date.strftime("%Y/%b/%d")
-        self.jyr = f"document.forms.form1.ContentPlaceHolder1_ddlYear.value={str(self.rel_year).lstrip('0')};"
-        self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value=0;"
-        self.jday = f"document.forms.form1.ContentPlaceHolder1_ddlday.value={str(self.rel_day).lstrip('0')};"
-        self.jmon = f"document.forms.form1.ContentPlaceHolder1_ddlMonth.value={str(self.rel_month).lstrip('0')};"
-        self.submit = f"document.forms.form1.submit()"
-        self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
-        yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
+        if (self.strp_date.date() == today.date() and "azure" in platform_release.lower()) or (self.strp_date.date() > today.date()):
+                print(f"Skipping as {self.strp_date.date()} is greater than {today.date()}")
+                pass
+        else:
+            self.rel_day = self.strp_date.strftime("%d")
+            self.rel_month = self.strp_date.strftime("%m")
+            self.rel_year = self.strp_date.strftime("%Y")
+            self.pib_date = self.strp_date.strftime("%Y/%b/%d")
+            self.jyr = f"document.forms.form1.ContentPlaceHolder1_ddlYear.value={str(self.rel_year).lstrip('0')};"
+            self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value=0;"
+            self.jday = f"document.forms.form1.ContentPlaceHolder1_ddlday.value={str(self.rel_day).lstrip('0')};"
+            self.jmon = f"document.forms.form1.ContentPlaceHolder1_ddlMonth.value={str(self.rel_month).lstrip('0')};"
+            self.submit = f"document.forms.form1.submit()"
+            self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
+            yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
 
     def parse_js(self, response):
         # for i in response.xpath("//div[contains(@class,'content-area')]/ul[contains(@class,'num')]"): #response.css("div.content-area ul.num"):
