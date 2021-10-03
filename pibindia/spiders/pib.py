@@ -59,7 +59,12 @@ class PibSpider(scrapy.Spider):
             pib_prid = str(articles.xpath("@href").get()).split("=", 1)[1]
             pib_title_unnorm = str(articles.xpath("@title").get())[:90]
             pib_title_norm = self.remove_html_entities(pib_title_unnorm)
-            pib_title_un = str(pib_title_norm).replace(" ", "_").replace("\n", "_")
+            pib_title_un = (
+                str(pib_title_norm)
+                .replace(" ", "_")
+                .replace("\n", "_")
+                .replace("’", "")
+            )
             pib_title_re = re.sub(
                 "[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_title_un
             )
@@ -74,6 +79,7 @@ class PibSpider(scrapy.Spider):
                 .replace(" ", "_")
                 .replace("&", "and")
                 .replace("\n", "_")
+                .replace("’", "")
             )
             pib_min = re.sub("[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_min_un)
             pib_prlink = str(pib_url) + str(pib_prid)
