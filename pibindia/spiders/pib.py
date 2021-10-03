@@ -6,6 +6,8 @@ from datetime import datetime
 import pdfkit
 import re
 import platform
+import html
+from unicodedata import normalize
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
 url = "https://pib.gov.in/AllRelease.aspx"
@@ -15,6 +17,7 @@ chromedriver = "selenium/chromedriver"
 chromedriver_path = Path(cwd, chromedriver).expanduser()
 platform_release = str(platform.release())
 today = datetime.today()
+
 
 class PibSpider(scrapy.Spider):
     name = "pib"
@@ -28,9 +31,12 @@ class PibSpider(scrapy.Spider):
     def start_requests(self):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
-        if (self.strp_date.date() == today.date() and "azure" in platform_release.lower()) or (self.strp_date.date() > today.date()):
-                print(f"Skipping as {self.strp_date.date()} is greater than {today.date()}")
-                pass
+        if (
+            self.strp_date.date() == today.date()
+            and "azure" in platform_release.lower()
+        ) or (self.strp_date.date() > today.date()):
+            print(f"Skipping as {self.strp_date.date()} is greater than {today.date()}")
+            pass
         else:
             self.rel_day = self.strp_date.strftime("%d")
             self.rel_month = self.strp_date.strftime("%m")
@@ -51,17 +57,20 @@ class PibSpider(scrapy.Spider):
             "//div[contains(@class,'content-area')]/ul[contains(@class,'num')]/li/a[contains(@href,'PRID')]"
         ):
             pib_prid = str(articles.xpath("@href").get()).split("=", 1)[1]
-            pib_title_un = (
-                str(articles.xpath("@title").get())[:90]
-                .replace(" ", "_")
-                .replace("\n", "_")
-            )
+            pib_title_unnorm = str(articles.xpath("@title").get())[:90]
+            pib_title_norm = self.remove_html_entities(pib_title_unnorm)
+            pib_title_un = str(pib_title_norm).replace(" ", "_").replace("\n", "_")
             pib_title_re = re.sub(
                 "[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_title_un
             )
             pib_title = pib_title_re + "_" + str(pib_prid) + ".pdf"
+
+            pib_min_unnorm = str(
+                articles.xpath("..//preceding-sibling::h3[1]/text()").get()
+            )
+            pib_min_norm = self.remove_html_entities(pib_min_unnorm)
             pib_min_un = (
-                str(articles.xpath("..//preceding-sibling::h3[1]/text()").get())
+                str(pib_min_norm)
                 .replace(" ", "_")
                 .replace("&", "and")
                 .replace("\n", "_")
@@ -104,3 +113,8 @@ class PibSpider(scrapy.Spider):
         else:
             print(f"downloading {pdf_path} ....")
             pdfkit.from_url(str(art_link), str(pdf_path), options=ops)
+
+    def remove_html_entities(self, txt):
+        str_html = html.unescape(str(txt))
+        str_normalized = normalize("NFKD", str_html)
+        return str(str_normalized)
