@@ -1,5 +1,18 @@
 # pib
 
+#### 2022
+[![PIB_India_Dec_2022](https://github.com/nit-in/pib/actions/workflows/pib_dec_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Dec)
+[![PIB_India_Nov_2022](https://github.com/nit-in/pib/actions/workflows/pib_nov_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Nov)
+[![PIB_India_Oct_2022](https://github.com/nit-in/pib/actions/workflows/pib_oct_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Oct)<br>
+[![PIB_India_Sep_2022](https://github.com/nit-in/pib/actions/workflows/pib_sep_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Sep)
+[![PIB_India_Aug_2022](https://github.com/nit-in/pib/actions/workflows/pib_aug_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Aug)
+[![PIB_India_Jul_2022](https://github.com/nit-in/pib/actions/workflows/pib_jul_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Jul)<br>
+[![PIB_India_Jun_2022](https://github.com/nit-in/pib/actions/workflows/pib_jun_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Jun)
+[![PIB_India_May_2022](https://github.com/nit-in/pib/actions/workflows/pib_may_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_May)
+[![PIB_India_Apr_2022](https://github.com/nit-in/pib/actions/workflows/pib_apr_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Apr)<br>
+[![PIB_India_Mar_2022](https://github.com/nit-in/pib/actions/workflows/pib_mar_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Mar)
+[![PIB_India_Feb_2022](https://github.com/nit-in/pib/actions/workflows/pib_feb_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Feb)
+[![PIB_India_Jan_2022](https://github.com/nit-in/pib/actions/workflows/pib_jan_2022.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2022_Jan)<br>
 #### 2021
 [![PIB_India_Dec_2021](https://github.com/nit-in/pib/actions/workflows/pib_dec_2021.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2021_Dec)
 [![PIB_India_Nov_2021](https://github.com/nit-in/pib/actions/workflows/pib_nov_2021.yml/badge.svg)](https://github.com/nit-in/pib/releases/tag/v2021_Nov)
