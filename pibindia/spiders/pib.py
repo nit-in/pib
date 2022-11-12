@@ -86,6 +86,10 @@ class PibSpider(scrapy.Spider):
             # print(self.pib_date,pib_min,pib_title,pib_prlink,sep="\n",end="\n\n\n")
             self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
 
+    def txtfile(self, txtfilepath, art_link):
+        with open(txtfilepath, 'a') as tfile:
+            tfile.write(art_link)
+    
     def download_article(self, art_title, art_link, art_min, art_date):
         pib_dir = "~/pib"
         pib_dir_path = Path(pib_dir).expanduser()
@@ -99,6 +103,9 @@ class PibSpider(scrapy.Spider):
         if not min_path.exists():
             min_path.mkdir(parents=True)
 
+        textf_name = art_date + ".txt"
+        textf_path = Path(pib_dir_path, textf_name).expanduser()
+        
         pdf_path = Path(min_path, art_title).expanduser()
         ops = {
             "quiet": "",
@@ -119,6 +126,7 @@ class PibSpider(scrapy.Spider):
         else:
             print(f"downloading {pdf_path} ....")
             pdfkit.from_url(str(art_link), str(pdf_path), options=ops)
+            self.txtfile(textf_path, art_link)
 
     def remove_html_entities(self, txt):
         str_html = html.unescape(str(txt))
