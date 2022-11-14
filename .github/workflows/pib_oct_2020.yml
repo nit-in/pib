@@ -61,5 +61,5 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "/home/runner/zips/*.zip, /home/runner/pib/*.txt"
+          artifacts: "/home/runner/zips/*.zip, /home/runner/piblinks/*.txt"
           token: ${{ secrets.PIB }}

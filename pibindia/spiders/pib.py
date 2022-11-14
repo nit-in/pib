@@ -87,14 +87,22 @@ class PibSpider(scrapy.Spider):
             self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
 
     def txtfile(self, txtfilepath, art_link):
-        with open(txtfilepath, 'a') as tfile:
-            tfile.write(art_link)
+        txtfilep = Path(txtfilepath).expanduser()
+        if not txtfilep.exists():
+            with open(str(txtfilep), 'w') as txtf:
+                pass
+        with open(str(txtfilep), 'a') as tfile:
+            tfile.write(str(art_link))
     
     def download_article(self, art_title, art_link, art_min, art_date):
         pib_dir = "~/pib"
+        pib_links = "~/piblinks"
         pib_dir_path = Path(pib_dir).expanduser()
+        pib_links_path = Path(pib_links).expanduser()
         if not pib_dir_path.exists():
             pib_dir_path.mkdir(parents=True)
+        if not pib_links_path.exists():
+            pib_links_path.mkdir(parentes=True)
         date_path = Path(pib_dir_path, art_date)
         min_path = Path(date_path, art_min)
 
@@ -103,8 +111,8 @@ class PibSpider(scrapy.Spider):
         if not min_path.exists():
             min_path.mkdir(parents=True)
 
-        textf_name = art_date + ".txt"
-        textf_path = Path(pib_dir_path, textf_name).expanduser()
+        textf_name = "PIB_LINKS_" + art_date + ".txt"
+        textf_path = Path(pib_links_path, str(textf_name)).expanduser()
         
         pdf_path = Path(min_path, art_title).expanduser()
         ops = {
@@ -125,8 +133,8 @@ class PibSpider(scrapy.Spider):
             print(f"{pdf_path} already downloded.")
         else:
             print(f"downloading {pdf_path} ....")
+            self.txtfile(str(textf_path), str(art_link))
             pdfkit.from_url(str(art_link), str(pdf_path), options=ops)
-            self.txtfile(textf_path, art_link)
 
     def remove_html_entities(self, txt):
         str_html = html.unescape(str(txt))
