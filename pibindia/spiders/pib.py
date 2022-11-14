@@ -93,6 +93,7 @@ class PibSpider(scrapy.Spider):
                 pass
         with open(str(txtfilep), 'a') as tfile:
             tfile.write(str(art_link))
+            tfile.write("\n")
     
     def download_article(self, art_title, art_link, art_min, art_date):
         pib_dir = "~/pib"
@@ -102,7 +103,7 @@ class PibSpider(scrapy.Spider):
         if not pib_dir_path.exists():
             pib_dir_path.mkdir(parents=True)
         if not pib_links_path.exists():
-            pib_links_path.mkdir(parentes=True)
+            pib_links_path.mkdir(parents=True)
         date_path = Path(pib_dir_path, art_date)
         min_path = Path(date_path, art_min)
 
@@ -111,7 +112,7 @@ class PibSpider(scrapy.Spider):
         if not min_path.exists():
             min_path.mkdir(parents=True)
 
-        textf_name = "PIB_LINKS_" + art_date + ".txt"
+        textf_name = "PIB_LINKS_" + art_date.replace("/", "_") + ".txt"
         textf_path = Path(pib_links_path, str(textf_name)).expanduser()
         
         pdf_path = Path(min_path, art_title).expanduser()
