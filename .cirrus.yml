@@ -42,7 +42,6 @@ task:
     - apt update
     - apt install --fix-missing -y rclone fd-find poppler-utils p7zip-full
     - ln -s $(which fdfind) /usr/bin/fd
-    - pip install -r requirements.txt
     - mkdir -p /root/.config/rclone
     - mkdir -p /tmp/pib
     - mkdir -p /tmp/pib_text
