@@ -1,5 +1,5 @@
 requests==2.26.0
-pdfkit==0.6.1
+pdfkit==1.0.0
 itemadapter==0.4.0
 scrapy_selenium==0.0.7
 Scrapy==2.7.1
