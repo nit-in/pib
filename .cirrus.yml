@@ -48,7 +48,8 @@ task:
     - touch /tmp/failed.txt
     - touch /root/.config/rclone/rclone.conf
     - echo "${rclone_config}" >> /root/.config/rclone/rclone.conf
-    - rclone tree 'gdrive:' | tee /root/gdrive.txt
+    - rclone tree 'gdrive:' >> /tmp/gdrive.txt
+    - cat /tmp/gdrive.txt
   pib_daily_articles_script:
     - source .env
     - shopt -s globstar
