@@ -1,9 +1,9 @@
-name: PIB_India
+name: PIB_India_Daily
 
 on:
-  push:
-    tags:
-      - 'PIB_*_*'
+
+  schedule:
+    - cron: '0 3 * * *'
 
   workflow_dispatch:
 
@@ -29,8 +29,8 @@ jobs:
         run:  |
           echo ${{ github.ref_name }}
           PIB_TAG=${{ github.ref_name }}
-          echo "PIB_MONTH=$(echo ${PIB_TAG} | egrep -o '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)')" >> $GITHUB_ENV
-          echo "PIB_YEAR=$(echo ${PIB_TAG} | egrep -o '202[0-9]')" >> $GITHUB_ENV
+          echo "PIB_MONTH=$(date +'%b')" >> $GITHUB_ENV
+          echo "PIB_YEAR=$(date +'%Y')" >> $GITHUB_ENV
 
       - name: run script
         run:  |
