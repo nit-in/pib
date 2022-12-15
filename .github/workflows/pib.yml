@@ -1,9 +1,9 @@
-name: PIB_India_Jan_2020
+name: PIB_India
 
 on:
   push:
     tags:
-      - 'v2020_Jan'
+      - 'PIB_*_*'
 
   workflow_dispatch:
 
@@ -11,10 +11,6 @@ jobs:
 
   pib_articles:
     runs-on: ubuntu-latest
-
-    env:
-      PIB_MONTH: Jan
-      PIB_YEAR: 2020
 
     steps:
       - uses: actions/checkout@v2
@@ -28,6 +24,13 @@ jobs:
           sudo ln -s $(which fdfind) /usr/bin/fd
           sudo pip install -r requirements.txt
           mkdir -p /home/runner/zips
+
+      - name: set env
+        run:  |
+          echo ${{ github.ref_name }}
+          PIB_TAG=${{ github.ref_name }}
+          echo "PIB_MONTH=$(echo ${PIB_TAG} | egrep -o '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)')" >> $GITHUB_ENV
+          echo "PIB_YEAR=$(echo ${PIB_TAG} | egrep -o '202[0-9]')" >> $GITHUB_ENV
 
       - name: run script
         run:  |
