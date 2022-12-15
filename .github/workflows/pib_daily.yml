@@ -28,7 +28,6 @@ jobs:
       - name: set env
         run:  |
           echo ${{ github.ref_name }}
-          PIB_TAG=${{ github.ref_name }}
           echo "PIB_MONTH=$(date +'%b')" >> $GITHUB_ENV
           echo "PIB_YEAR=$(date +'%Y')" >> $GITHUB_ENV
 
