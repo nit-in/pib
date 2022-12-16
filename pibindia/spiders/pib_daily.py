@@ -41,7 +41,7 @@ class PibSpider(scrapy.Spider):
         self.jmon = f"document.forms.form1.ContentPlaceHolder1_ddlMonth.value={str(self.rel_month).lstrip('0')};"
         self.submit = f"document.forms.form1.submit()"
         self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
-         yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
+        yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
 
     def parse_js(self, response):
         # for i in response.xpath("//div[contains(@class,'content-area')]/ul[contains(@class,'num')]"): #response.css("div.content-area ul.num"):
