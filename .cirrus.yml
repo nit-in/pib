@@ -55,4 +55,4 @@ task:
     - shopt -s globstar
     - pib_mon=$(date +"%b")
     - pib_year=$(date +"%Y")
-    - download_pib_current $pib_mon $pib_year $bot_token $channel_id
+    - pib_daily_run $pib_mon $pib_year $bot_token $channel_id
