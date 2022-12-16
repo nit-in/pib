@@ -3,7 +3,7 @@ name: PIB_India
 on:
   push:
     tags:
-      - 'PIB_*_*'
+      - 'PIB_India_*_*'
 
   workflow_dispatch:
 
