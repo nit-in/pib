@@ -3,7 +3,7 @@ name: PIB_India_Daily
 on:
 
   schedule:
-    - cron: '0 0/3 * * *'
+    - cron: '0 */3 * * *'
 
   workflow_dispatch:
 
