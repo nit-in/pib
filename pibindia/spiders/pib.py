@@ -112,7 +112,9 @@ class PibSpider(scrapy.Spider):
         if not min_path.exists():
             min_path.mkdir(parents=True)
 
-        textf_name = "PIB_LINKS_" + art_date.replace("/", "_") + ".txt"
+        text_art_date = datetime.strptime(art_date, "%Y/%b/%d")
+        text_date = datetime.strftime("%d_%b_%Y")
+        textf_name = "PIB_LINKS_" + str(text_date) + ".txt"
         textf_path = Path(pib_links_path, str(textf_name)).expanduser()
         
         pdf_path = Path(min_path, art_title).expanduser()
