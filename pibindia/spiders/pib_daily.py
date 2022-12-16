@@ -87,7 +87,7 @@ class PibSpider(scrapy.Spider):
         with open(str(txtfilep), 'a') as tfile:
             tfile.write(str(art_link))
             tfile.write("\n")
-    
+
     def download_article(self, art_title, art_link, art_min, art_date):
         pib_dir = "~/pib"
         pib_links = "~/piblinks"
@@ -107,7 +107,7 @@ class PibSpider(scrapy.Spider):
 
         textf_name = "PIB_LINKS_" + art_date.replace("/", "_") + ".txt"
         textf_path = Path(pib_links_path, str(textf_name)).expanduser()
-        
+
         pdf_path = Path(min_path, art_title).expanduser()
         ops = {
             "quiet": "",
