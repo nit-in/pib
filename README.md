@@ -61,13 +61,13 @@ This might be helpful for candidates preparing for different govt examinations.
 ## Downloading Articles:
 You can either use the spider by cloning this repo and following the instructions given below<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;or<br>
-You can download the articles direcly from the release section or by clicking on the <b>badges</b> above
+You can download the articles direcly from the release section or by clicking on the <b>badges</b> above for the year and month.
 
 There are 4 different kind of zips in the release section for every month
-1. <b>Day wise</b> PIB_DD_MMM_YYYY.zip : These zips contain the PIB articles for the date <i>DD/MMM/YYYY</i>
-2. <b>Month wise</b> PIB_MMM_YYYY.zip : These zips contain the PIB articles for the whole month <i>MMM/YYYY</i>
-3. <b>Text files</b> PIB_TEXT_MMM_YYYY.zip : These zips contain the text extracted from pdf of the whole month <i>MMM/YYYY</i>
-4. <b>Article Link files</b> PIB_LINKS_YYYY_MMM_DD.txt : These text files contains links for the article for the date <i>DD/MMM/YYYY</i>
+1. <b>Day wise</b> PIB_Daily | MMM_YYYY : These zips contain the PIB articles for the date <i>DD/MMM/YYYY</i>
+2. <b>Month wise</b> PIB_Monthly | MMM_YYYY : These zips contain the PIB articles for the whole month <i>MMM/YYYY</i>
+3. <b>Text files</b> PIB_Text | MMM_YYYY : These zips contain the text extracted from pdf of the whole month <i>MMM/YYYY</i>
+4. <b>Article Link files</b> PIB_LINKS | MMM_YYYY : These text files contains links for the article for the date <i>DD/MMM/YYYY</i>
 
 ## How to use:
 
