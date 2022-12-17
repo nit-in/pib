@@ -36,7 +36,6 @@ jobs:
       - name: run script
         run:  |
           source .env
-          pib_last_day
           pib_today
 
       - name: make txt files
