@@ -65,6 +65,15 @@ jobs:
           cd /home/runner/pib_text/${{ env.PIB_YEAR }}
           zip -r "/home/runner/zips/text/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
 
+      - name: Create Monthly zip
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/home/runner/zips/monthly/*.zip"
+          token: ${{ secrets.PIB }}
+          tag: "PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}"
+          allowUpdates: true
+          body : "PIB articles for the month of ${{ env.PIB_MONTH }}, ${{ env.PIB_YEAR }}"
+
       - name: Create Daily zips
         uses: ncipollo/release-action@v1
         with:
