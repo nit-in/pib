@@ -101,6 +101,12 @@ pib_month Jan 2021
 
 #For the month of Dec, 2020
 pib_month Dec 2020
+
+#For present day
+pib_today
+
+#For last day
+pib_last_day
 ``` 
 
 Any suggestions and improvements are welcome.
