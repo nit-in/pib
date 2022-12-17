@@ -32,7 +32,15 @@ jobs:
           echo ${{ github.ref_name }}
           echo "PIB_MONTH=$(date +'%b')" >> $GITHUB_ENV
           echo "PIB_YEAR=$(date +'%Y')" >> $GITHUB_ENV
-
+          
+      - name: download and unzip previous articles
+        run:  |
+          cd /home/runner
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Text_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner
+          
       - name: run script
         run:  |
           source .env
