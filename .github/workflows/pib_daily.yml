@@ -26,6 +26,7 @@ jobs:
           mkdir -p /home/runner/zips
           mkdir -p /home/runner/zips/text
           mkdir -p /home/runner/zips/daily
+          mkdir -p /home/runner/pib
 
       - name: set env
         run:  |
@@ -37,9 +38,9 @@ jobs:
         run:  |
           cd /home/runner
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
-          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner
+          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Text_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
-          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner
+          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib
           
       - name: run script
         run:  |
