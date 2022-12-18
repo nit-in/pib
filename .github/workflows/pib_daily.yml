@@ -53,6 +53,11 @@ jobs:
           source .env
           pdftxt
 
+      - name: zipup_months_articles
+        run:  |
+          cd /home/runner/pib/${{ env.PIB_YEAR }}
+          zip -r "/home/runner/zips/monthly/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+
       - name: zipup_months_articles_by_days
         run:  |
           cd /home/runner
