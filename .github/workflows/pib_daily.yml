@@ -27,6 +27,7 @@ jobs:
           mkdir -p /home/runner/zips/text
           mkdir -p /home/runner/zips/daily
           mkdir -p /home/runner/pib
+          mkdir -p /home/runner/pib_text
 
       - name: set env
         run:  |
