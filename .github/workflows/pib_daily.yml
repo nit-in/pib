@@ -38,9 +38,9 @@ jobs:
         run:  |
           cd /home/runner
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
-          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib
+          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }}
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Text_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
-          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib
+          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib_text/${{ env.PIB_YEAR }}
           
       - name: run script
         run:  |
