@@ -35,6 +35,12 @@ jobs:
           echo "PIB_MONTH=$(echo ${PIB_TAG} | egrep -o '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)')" >> $GITHUB_ENV
           echo "PIB_YEAR=$(echo ${PIB_TAG} | egrep -o '202[0-9]')" >> $GITHUB_ENV
 
+      - name: download and unzip previous articles
+        run:  |
+          cd /home/runner
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || true
+          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || true
+
       - name: run script
         run:  |
           source .env
