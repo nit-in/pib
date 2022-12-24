@@ -53,6 +53,7 @@ jobs:
         run:  |
           source .env
           pib_today
+          pib_last_day
 
       - name: make txt files
         run:  |
