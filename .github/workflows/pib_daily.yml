@@ -23,13 +23,8 @@ jobs:
           sudo apt install --fix-missing -y python3 wkhtmltopdf fd-find poppler-utils
           sudo ln -s $(which fdfind) /usr/bin/fd
           sudo pip install -r requirements.txt
-          mkdir -p /home/runner/zips
-          mkdir -p /home/runner/zips/text
-          mkdir -p /home/runner/zips/daily
-          mkdir -p /home/runner/pib
-          mkdir -p /home/runner/pib_text
-          mkdir -p /home/runner/zips/monthly
-          mkdir -p /home/runner/piblinks
+          mkdir -p /home/runner/{zips,pib,pib_text,piblinks}
+          mkdir -p /home/runner/zips/{text,daily,monthly}
 
       - name: set env
         run:  |
@@ -39,21 +34,22 @@ jobs:
           
       - name: download and unzip previous articles
         run:  |
+          source .env
           cd /home/runner
-          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || true
-          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || true
-          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Text_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || true
-          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib_text/${{ env.PIB_YEAR }} || true
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || err_handle "12" "Failed to unzip PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Text_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
+          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib_text/${{ env.PIB_YEAR }} || err_handle "13" "Failed to unzip PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
           tday=$(date +"%d_%b_%Y")
           lnkfile="PIB_LINKS_${tday}.txt"
-          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}" || true
-          mv ${lnkfile} /home/runner/piblinks/${lnkfile} || true
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}" || err_handle "14" "Failed to download PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}"
+          mv ${lnkfile} /home/runner/piblinks/${lnkfile} || err_handle "16" "Failed to copy ${lnkfile}"
           
       - name: run script
         run:  |
           source .env
-          pib_today
-          pib_last_day
+          pib_today || err_handle "10" "PIB_TODAY running failed"
+          pib_last_day || err_handle "10" "PIB_LAST_DAY running failed"
 
       - name: make txt files
         run:  |
@@ -62,22 +58,25 @@ jobs:
 
       - name: zipup_months_articles
         run:  |
+          source .env
           cd /home/runner/pib/${{ env.PIB_YEAR }}
-          zip -r "/home/runner/zips/monthly/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+          zip -r "/home/runner/zips/monthly/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }} || err_handle "12" "Failed to zip PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
 
       - name: zipup_months_articles_by_days
         run:  |
+          source .env
           cd /home/runner
           for day in pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}/*; do
             echo $day
             dayname=$(basename $day)
-            zip -r "/home/runner/zips/daily/PIB_${dayname}_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day
+            zip -r "/home/runner/zips/daily/PIB_${dayname}_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day || err_handle "12" "Failed to zip PIB_${dayname}_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
           done
 
       - name: zipup_text
         run:  |
+          source .env
           cd /home/runner/pib_text/${{ env.PIB_YEAR }}
-          zip -r "/home/runner/zips/text/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }}
+          zip -r "/home/runner/zips/text/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }} || err_handle "12" "Failed to zip PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
 
       - name: Create Monthly zip
         uses: ncipollo/release-action@v1
