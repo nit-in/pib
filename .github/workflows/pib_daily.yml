@@ -37,9 +37,9 @@ jobs:
           source .env
           cd /home/runner
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
-          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || err_handle "12" "Failed to unzip PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
-          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Text_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
-          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib_text/${{ env.PIB_YEAR }} || err_handle "13" "Failed to unzip PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
+          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || err_handle "12" "Failed to unzip PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Text_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          unzip "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib_text/${{ env.PIB_YEAR }} || err_handle "13" "Failed to unzip PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
           tday=$(date +"%d_%b_%Y")
           lnkfile="PIB_LINKS_${tday}.txt"
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}" || err_handle "14" "Failed to download PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}"
@@ -60,7 +60,7 @@ jobs:
         run:  |
           source .env
           cd /home/runner/pib/${{ env.PIB_YEAR }}
-          zip -r "/home/runner/zips/monthly/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }} || err_handle "12" "Failed to zip PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip
+          zip -r "/home/runner/zips/monthly/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }} || err_handle "12" "Failed to zip PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
 
       - name: zipup_months_articles_by_days
         run:  |
