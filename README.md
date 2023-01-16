@@ -78,6 +78,9 @@ Download articles from [Press Information Bureau, India](https://www.pib.gov.in)
 This might be helpful for candidates preparing for different govt examinations.
 
 ## Downloading Articles:
+
+<b>Join the telegram channel to get PIB Articles daily, click [here](https://t.me/pibarticles)</b>
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;or<br>
 You can either use the spider by cloning this repo and following the instructions given below<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;or<br>
 You can download the articles direcly from the release section or by clicking on the <b>badges</b> above for the year and month.
