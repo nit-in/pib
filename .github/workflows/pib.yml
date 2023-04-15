@@ -35,6 +35,7 @@ jobs:
       - name: download and unzip previous articles
         run:  |
           source .env
+          mkdir /home/runner/pib/${{ env.PIB_YEAR }}
           cd /home/runner
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
           unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || err_handle "12" "Error unzipping PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
