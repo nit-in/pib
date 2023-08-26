@@ -24,7 +24,8 @@ jobs:
           sudo ln -s $(which fdfind) /usr/bin/fd
           sudo pip install -r requirements.txt
           mkdir -p /home/runner/zips/{text,monthly,daily}
-
+          sudo pip install -U pyopenssl cryptography
+          
       - name: set env
         run:  |
           echo ${{ github.ref_name }}
