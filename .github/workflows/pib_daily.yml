@@ -25,6 +25,7 @@ jobs:
           sudo pip install -r requirements.txt
           mkdir -p /home/runner/{zips,pib,pib_text,piblinks}
           mkdir -p /home/runner/zips/{text,daily,monthly}
+          sudo pip install -U pyopenssl cryptography
 
       - name: set env
         run:  |
