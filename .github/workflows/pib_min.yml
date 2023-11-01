@@ -1,4 +1,4 @@
-name: PIB_India
+name: PIB_India_Ministry
 
 on:
   workflow_dispatch:
