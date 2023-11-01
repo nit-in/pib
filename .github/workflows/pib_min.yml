@@ -143,15 +143,7 @@ jobs:
           PIB_TAG=${{ inputs.customTag }}
           echo "PIB_MONTH=$(echo ${PIB_TAG} | egrep -o '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)')" >> $GITHUB_ENV
           echo "PIB_YEAR=$(echo ${PIB_TAG} | egrep -o '202[0-9]')" >> $GITHUB_ENV
-
-      - name: download and unzip previous articles
-        run:  |
-          source .env
-          mkdir -p /home/runner/pib/${{ env.PIB_YEAR }}
-          cd /home/runner
-          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
-          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || err_handle "12" "Error unzipping PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
-
+          
       - name: run script
         run:  |
           source .env
