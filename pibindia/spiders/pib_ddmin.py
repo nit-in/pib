@@ -32,6 +32,8 @@ class PibSpider(scrapy.Spider):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
         self.minis_code = self.rel_mincode
+        print("minitry code....")
+        print(str(self.minis_code))
         if (
             self.strp_date.date() == today.date()
             and "azure" in platform_release.lower()
