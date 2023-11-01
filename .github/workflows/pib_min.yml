@@ -1,0 +1,222 @@
+name: PIB_India
+
+on:
+  workflow_dispatch:
+    inputs:
+      desc:
+        description: 'Kindly enter the dates for the same month (for now) in the following boxes'
+      intialDate:
+        description: 'Intial Date in yyyy-mm-dd format'
+        required: true
+        type: string
+        
+      lastDate:
+        description: 'Last Date in yyyy-mm-dd format'
+        required: true
+        type: string
+        
+      customTag:
+        description: 'make a custom tag for zip in format abc...MMM ..YYYY...xyz'
+        required: true
+        default: 'PIB_Nov_2023'
+        type: string
+
+      ministrycode:
+        description: 'Enter the ministry code'
+        required: true
+        default: 0
+        type: choice
+        options:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 61
+        - 62
+        - 63
+        - 68
+        - 70
+        - 71
+        - 75
+        - 80
+        - 72
+        - 14
+        - 45
+        - 56
+        - 35
+        - 1330
+        - 27
+        - 58
+        - 41
+        - 26
+        - 42
+        - 16
+        - 24
+        - 60
+        - 39
+        - 1440
+        - 66
+        - 17
+        - 33
+        - 57
+        - 48
+        - 73
+        - 67
+        - 8
+        - 1323
+        - 30
+        - 4
+        - 15
+        - 1340
+        - 40
+        - 31
+        - 53
+        - 5
+        - 47
+        - 11
+        - 1336
+        - 21
+        - 7
+        - 51
+        - 44
+        - 65
+        - 28
+        - 59
+        - 10
+        - 12
+        - 6
+        - 20
+        - 79
+        - 52
+        - 23
+        - 69
+        - 43
+        - 13
+        - 46
+        - 77
+        - 50
+        - 55
+        - 18
+        - 25
+        - 19
+        - 36
+        - 49
+        - 32
+        - 38
+        - 64
+        - 9
+        - 78
+        - 1325
+        - 74
+        - 34
+        - 37
+        - 1005
+        - 1406
+        - 1454
+        - 1458
+        - 1470
+        - 1484
+
+
+jobs:
+
+  pib_articles:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: setting_up
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        run:  |
+          sudo apt update
+          sudo apt install --fix-missing -y python3 wkhtmltopdf fd-find poppler-utils
+          sudo ln -s $(which fdfind) /usr/bin/fd
+          sudo pip install -r requirements.txt
+          mkdir -p /home/runner/zips/{text,monthly,daily}
+          sudo pip install -U pyopenssl cryptography
+          
+      - name: set env
+        run:  |
+          echo ${{ inputs.customTag }}
+          PIB_TAG=${{ inputs.customTag }}
+          echo "PIB_MONTH=$(echo ${PIB_TAG} | egrep -o '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)')" >> $GITHUB_ENV
+          echo "PIB_YEAR=$(echo ${PIB_TAG} | egrep -o '202[0-9]')" >> $GITHUB_ENV
+
+      - name: download and unzip previous articles
+        run:  |
+          source .env
+          mkdir -p /home/runner/pib/${{ env.PIB_YEAR }}
+          cd /home/runner
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/${{ env.PIB_YEAR }} || err_handle "12" "Error unzipping PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+
+      - name: run script
+        run:  |
+          source .env
+          dwngrd_chrome
+          pib_min ${{ inputs.intialDate }} ${{ inputs.lastDate }} ${{ inputs.ministrycode }} || err_handle "10" "Spider failed to run"
+
+      - name: make txt files
+        run:  |
+          source .env
+          pdftxt
+
+      - name: zipup_months_articles
+        run:  |
+          source .env
+          cd /home/runner/pib/${{ env.PIB_YEAR }}
+          zip -r "/home/runner/zips/monthly/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }} || err_handle "13" "Failed to create PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+
+      - name: zipup_months_articles_by_days
+        run:  |
+          source .env
+          cd /home/runner
+          for day in pib/${{ env.PIB_YEAR }}/${{ env.PIB_MONTH }}/*; do
+            echo $day
+            dayname=$(basename $day)
+            zip -r "/home/runner/zips/daily/PIB_${dayname}_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" $day || err_handle "13" "Failed to create PIB_${dayname}_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          done
+
+      - name: zipup_text
+        run:  |
+          source .env
+          cd /home/runner/pib_text/${{ env.PIB_YEAR }}
+          zip -r "/home/runner/zips/text/PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" ${{ env.PIB_MONTH }} || err_handle "13" "PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+
+      - name: Create Monthly zip
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/home/runner/zips/monthly/*.zip"
+          token: ${{ secrets.PIB }}
+          tag: "PIB_${{ inputs.customTag }}"
+          allowUpdates: true
+          body : "PIB articles from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
+
+      - name: Create Daily zips
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/home/runner/zips/daily/*.zip"
+          token: ${{ secrets.PIB }}
+          tag: "PIB_Daily_${{ inputs.customTag }}"
+          allowUpdates: true
+          body : "PIB articles (by date) from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
+
+      - name: Create text zips
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/home/runner/zips/text/*.zip"
+          token: ${{ secrets.PIB }}
+          tag: "PIB_Text_${{ inputs.customTag }}"
+          allowUpdates: true
+          body : "PIB articles text from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
+
+      - name: Create Link text files
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "/home/runner/piblinks/*.txt"
+          token: ${{ secrets.PIB }}
+          tag: "PIB_Links_${{ inputs.customTag }}"
+          allowUpdates: true
+          body : "PIB articles links from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
