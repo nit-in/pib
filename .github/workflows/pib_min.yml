@@ -140,7 +140,7 @@ jobs:
       - name: set env
         run:  |
           echo ${{ inputs.customTag }}
-          PIB_TAG=${{ inputs.customTag }} >> $GITHUB_ENV
+          echo PIB_TAG=${{ inputs.customTag }} >> $GITHUB_ENV
           
       - name: run script
         run:  |
@@ -157,7 +157,7 @@ jobs:
         run:  |
           source .env
           cd /home/runner/
-          zip -r "/home/runner/zips/monthly/PIB_${{ PIB_TAG }}.zip" pib || err_handle "13" "Failed to create PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          zip -r "/home/runner/zips/monthly/PIB_${{ env.PIB_TAG }}.zip" pib || err_handle "13" "Failed to create PIB_${{ env.PIB_TAG }}.zip"
 
       - name: zipup_months_articles_by_days
         run:  |
@@ -166,7 +166,7 @@ jobs:
           for day in pib/*/*/*; do
             echo $day
             dayname=$(basename $day)
-            zip -r "/home/runner/zips/daily/PIB_${dayname}_${{ PIB_TAG }}.zip" $day || err_handle "13" "Failed to create PIB_${dayname}_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+            zip -r "/home/runner/zips/daily/PIB_${dayname}_${{ env.PIB_TAG }}.zip" $day || err_handle "13" "Failed to create PIB_${dayname}_${{ env.PIB_TAG }}.zip"
           done
 
       - name: Create Monthly zip
@@ -174,7 +174,7 @@ jobs:
         with:
           artifacts: "/home/runner/zips/monthly/*.zip"
           token: ${{ secrets.PIB }}
-          tag: "PIB_All_${{ PIB_TAG }}"
+          tag: "PIB_All_${{ env.PIB_TAG }}"
           allowUpdates: true
           body : "PIB articles from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
 
@@ -183,7 +183,7 @@ jobs:
         with:
           artifacts: "/home/runner/zips/daily/*.zip"
           token: ${{ secrets.PIB }}
-          tag: "PIB_Daily_${{ PIB_TAG }}"
+          tag: "PIB_Daily_${{ env.PIB_TAG }}"
           allowUpdates: true
           body : "PIB articles (by date) from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
 
@@ -192,6 +192,6 @@ jobs:
         with:
           artifacts: "/home/runner/piblinks/*.txt"
           token: ${{ secrets.PIB }}
-          tag: "PIB_Links_${{ PIB_TAG }}"
+          tag: "PIB_Links_${{ env.PIB_TAG }}"
           allowUpdates: true
           body : "PIB articles links from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
