@@ -166,7 +166,11 @@ jobs:
           for day in pib/*/*/*; do
             echo $day
             dayname=$(basename $day)
-            zip -r "/home/runner/zips/daily/PIB_${dayname}_${{ env.PIB_TAG }}.zip" $day || err_handle "13" "Failed to create PIB_${dayname}_${{ env.PIB_TAG }}.zip"
+            monthdir=$(dirname $day)
+            monthname=$(basename $monthdir)
+            yeardir=$(dirname $monthdir)
+            yearname=$(basename $yeardir)
+            zip -r "/home/runner/zips/daily/PIB_${dayname}_${monthname}_${yearname}_${{ env.PIB_TAG }}.zip" $day || err_handle "13" "Failed to create PIB_${dayname}_${{ env.PIB_TAG }}.zip"
           done
 
       - name: Create Monthly zip
