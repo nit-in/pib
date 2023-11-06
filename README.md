@@ -131,4 +131,25 @@ pib_today
 pib_last_day
 ``` 
 
+> You can now fork the repo and Go to (You may have add repo secret named PIB) check the [process](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-secrets-for-your-repository-and-organization-for-github-codespaces#:~:text=Adding%20secrets%20for%20a%20repository,-To%20create%20secrets&text=Under%20your%20repository%20name%2C%20click,page%2C%20click%20New%20repository%20secret.)
+> 
+> ```
+> Actions > Select "PIB_INDIA_MINISTRY" > Run workflow
+> and Select appropriate options and run the workflow
+> ```
+> 
+> ![IMG_20231106_101656](https://user-images.githubusercontent.com/8947263/280597016-38355326-e425-4cd0-9d93-156d39abded5.jpg)
+> 
+> To run locally
+> 
+> ```
+> source .env
+> pib_min start_date end_date ministry_code
+> ```
+> 
+> **For ministry code check ministries.txt file for desired ministry**
+
+
+
+
 Any suggestions and improvements are welcome.
