@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       desc:
-        description: 'Kindly enter the dates for the same month (for now) in the following boxes'
+        description: 'Enter the appropriate data in the following sections'
+        default: 'LEAVE THIS BLANK'
+        
       intialDate:
         description: 'Intial Date in yyyy-mm-dd format'
         required: true
