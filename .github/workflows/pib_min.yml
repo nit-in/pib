@@ -5,7 +5,7 @@ on:
     inputs:
       desc:
         description: 'Enter the appropriate data in the following sections'
-        default: 'LEAVE THIS BLANK'
+        default: 'DO NOT EDIT THIS LEAVE THIS AS IS'
         
       intialDate:
         description: 'Intial Date in yyyy-mm-dd format'
@@ -24,7 +24,8 @@ on:
         type: string
 
       ministrycode:
-        description: 'Enter the ministry code'
+        description: 'Enter the ministry code
+(Find the ministry code from ministries.txt file)'
         required: true
         default: 0
         type: choice
