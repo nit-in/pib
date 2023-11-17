@@ -148,6 +148,28 @@ pib_last_day
 > ```
 > 
 > **For ministry code check ministries.txt file for desired ministry**
+## Read this if you are forking the repo
+
+you may have trouble with github tokens when you are running it after forking it
+click on profile icon > Settings > Developer settings > Personal access tokens > generate new token(classic)
+Name it, no expiration
+in scopes > select repo, workflow, write and delete packages, 
+then generate and copy it
+![IMG_20231117_204211.jpg](https://github.com/nit-in/pib/assets/8947263/f4ae732c-db31-4cda-8dbc-caa8f2496bdc)
+
+
+
+
+ then go to pib repo
+Settings > Secrets and variables > Actions
+here new repository secret
+in name enter PIB ( all in caps)
+and in secret > paste the token you copied
+![IMG_20231117_204101.jpg](https://github.com/nit-in/pib/assets/8947263/df02db15-7238-4f09-b11a-fa86477cdcb3)
+
+
+
+
 
 
 
