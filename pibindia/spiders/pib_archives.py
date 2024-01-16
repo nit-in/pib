@@ -10,7 +10,7 @@ import html
 from unicodedata import normalize
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
-url = "https://pib.gov.in/AllRelease.aspx"
+url = "https://archive.pib.gov.in/archive2/erelease.aspx"
 pib_url = "https://pib.gov.in/PressReleaseIframePage.aspx?PRID="
 cwd = Path.cwd()
 chromedriver = "selenium/chromedriver"
@@ -20,7 +20,7 @@ today = datetime.today()
 
 
 class PibSpider(scrapy.Spider):
-    name = "pib_ddmin"
+    name = "pib_archives"
     allowed_domains = ["pib.gov.in"]
 
     custom_settings = {
