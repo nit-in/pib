@@ -11,7 +11,7 @@ from unicodedata import normalize
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
 url = "https://archive.pib.gov.in/archive2/erelease.aspx"
-pib_url = "https://pib.gov.in/PressReleaseIframePage.aspx?PRID="
+pib_url = "https://archive.pib.gov.in/newsite/PrintRelease.aspx?relid="
 cwd = Path.cwd()
 chromedriver = "selenium/chromedriver"
 chromedriver_path = Path(cwd, chromedriver).expanduser()
