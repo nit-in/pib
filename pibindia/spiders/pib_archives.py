@@ -44,11 +44,11 @@ class PibSpider(scrapy.Spider):
             self.rel_month = self.strp_date.strftime("%m")
             self.rel_year = self.strp_date.strftime("%Y")
             self.pib_date = self.strp_date.strftime("%Y/%b/%d")
-            self.jyr = f"document.forms.form1.ContentPlaceHolder1_ddlYear.value={str(self.rel_year).lstrip('0')};"
+            self.jyr = f"document.forms.form1.ryearID.value={str(self.rel_year).lstrip('0')};"
             self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value={str(self.minis_code)};"
-            self.jday = f"document.forms.form1.ContentPlaceHolder1_ddlday.value={str(self.rel_day).lstrip('0')};"
-            self.jmon = f"document.forms.form1.ContentPlaceHolder1_ddlMonth.value={str(self.rel_month).lstrip('0')};"
-            self.submit = f"document.forms.form1.submit()"
+            self.jday = f"document.forms.form1.rdateID.value={str(self.rel_day).lstrip('0')};"
+            self.jmon = f"document.forms.form1.rmonthID.value={str(self.rel_month).lstrip('0')};"
+            self.submit = f"datewise()"
             self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
             yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
 
