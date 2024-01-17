@@ -31,6 +31,8 @@ class PibSpider(scrapy.Spider):
     def start_requests(self):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
+        self.minis_code = self.rel_mincode
+        
         if (
             self.strp_date.date() == today.date()
             and "azure" in platform_release.lower()
@@ -43,7 +45,7 @@ class PibSpider(scrapy.Spider):
             self.rel_year = self.strp_date.strftime("%Y")
             self.pib_date = self.strp_date.strftime("%Y/%b/%d")
             self.jyr = f"document.forms.form1.ContentPlaceHolder1_ddlYear.value={str(self.rel_year).lstrip('0')};"
-            self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value=0;"
+            self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value={str(self.minis_code)};"
             self.jday = f"document.forms.form1.ContentPlaceHolder1_ddlday.value={str(self.rel_day).lstrip('0')};"
             self.jmon = f"document.forms.form1.ContentPlaceHolder1_ddlMonth.value={str(self.rel_month).lstrip('0')};"
             self.submit = f"document.forms.form1.submit()"
