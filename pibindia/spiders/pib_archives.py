@@ -32,7 +32,7 @@ class PibSpider(scrapy.Spider):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
         self.minis_code = self.rel_mincode
-        
+
         if (
             self.strp_date.date() == today.date()
             and "azure" in platform_release.lower()
@@ -44,9 +44,13 @@ class PibSpider(scrapy.Spider):
             self.rel_month = self.strp_date.strftime("%m")
             self.rel_year = self.strp_date.strftime("%Y")
             self.pib_date = self.strp_date.strftime("%Y/%b/%d")
-            self.jyr = f"document.forms.form1.ryearID.value={str(self.rel_year).lstrip('0')};"
+            self.jyr = (
+                f"document.forms.form1.ryearID.value={str(self.rel_year).lstrip('0')};"
+            )
             self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value={str(self.minis_code)};"
-            self.jday = f"document.forms.form1.rdateID.value={str(self.rel_day).lstrip('0')};"
+            self.jday = (
+                f"document.forms.form1.rdateID.value={str(self.rel_day).lstrip('0')};"
+            )
             self.jmon = f"document.forms.form1.rmonthID.value={str(self.rel_month).lstrip('0')};"
             self.submit = f"datewise()"
             self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
@@ -55,11 +59,9 @@ class PibSpider(scrapy.Spider):
     def parse_js(self, response):
         # for i in response.xpath("//div[contains(@class,'content-area')]/ul[contains(@class,'num')]"): #response.css("div.content-area ul.num"):
         # 	print(i.xpath("//h3").extract(),i.xpath("//li/a[contains(@href,'PRID')]").extract(),i.xpath("//h3/following-sibling").extract())
-        for articles in response.xpath(
-            "//div[contains(@class,'content-area')]/ul[contains(@class,'num')]/li/a[contains(@href,'PRID')]"
-        ):
-            pib_prid = str(articles.xpath("@href").get()).split("=", 1)[1]
-            pib_title_unnorm = str(articles.xpath("@title").get())[:90]
+        for articles in response.xpath("//li[contains(@onclick,'Getrelease')]"):
+            pib_prid = str(articles.xpath("@id").get())
+            pib_title_unnorm = str(articles.xpath("text()").get())[:90]
             pib_title_norm = self.remove_html_entities(pib_title_unnorm)
             pib_title_un = (
                 str(pib_title_norm)
@@ -73,7 +75,7 @@ class PibSpider(scrapy.Spider):
             pib_title = pib_title_re + "_" + str(pib_prid) + ".pdf"
 
             pib_min_unnorm = str(
-                articles.xpath("..//preceding-sibling::h3[1]/text()").get()
+                articles.xpath("..//preceding-sibling::li/text()").get()
             )
             pib_min_norm = self.remove_html_entities(pib_min_unnorm)
             pib_min_un = (
@@ -94,7 +96,7 @@ class PibSpider(scrapy.Spider):
             txtfilep.touch(exist_ok=True)
 
         if not art_link in txtfilep.read_text():
-            with open(str(txtfilep), 'a') as tfile:
+            with open(str(txtfilep), "a") as tfile:
                 tfile.write(str(art_link))
                 tfile.write("\n")
 
@@ -119,7 +121,7 @@ class PibSpider(scrapy.Spider):
         text_date = text_art_date.strftime("%d_%b_%Y")
         textf_name = "PIB_LINKS_" + str(text_date) + ".txt"
         textf_path = Path(pib_links_path, str(textf_name)).expanduser()
-        
+
         pdf_path = Path(min_path, art_title).expanduser()
         self.txtfile(str(textf_path), str(art_link))
         ops = {
@@ -146,5 +148,3 @@ class PibSpider(scrapy.Spider):
         str_html = html.unescape(str(txt))
         str_normalized = normalize("NFKD", str_html)
         return str(str_normalized)
-
-

@@ -32,7 +32,7 @@ class PibSpider(scrapy.Spider):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
         self.minis_code = self.rel_mincode
-        
+
         if (
             self.strp_date.date() == today.date()
             and "azure" in platform_release.lower()
@@ -94,7 +94,7 @@ class PibSpider(scrapy.Spider):
             txtfilep.touch(exist_ok=True)
 
         if not art_link in txtfilep.read_text():
-            with open(str(txtfilep), 'a') as tfile:
+            with open(str(txtfilep), "a") as tfile:
                 tfile.write(str(art_link))
                 tfile.write("\n")
 
@@ -119,7 +119,7 @@ class PibSpider(scrapy.Spider):
         text_date = text_art_date.strftime("%d_%b_%Y")
         textf_name = "PIB_LINKS_" + str(text_date) + ".txt"
         textf_path = Path(pib_links_path, str(textf_name)).expanduser()
-        
+
         pdf_path = Path(min_path, art_title).expanduser()
         self.txtfile(str(textf_path), str(art_link))
         ops = {
@@ -146,5 +146,3 @@ class PibSpider(scrapy.Spider):
         str_html = html.unescape(str(txt))
         str_normalized = normalize("NFKD", str_html)
         return str(str_normalized)
-
-
