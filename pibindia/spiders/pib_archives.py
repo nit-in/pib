@@ -47,7 +47,7 @@ class PibSpider(scrapy.Spider):
             self.jyr = (
                 f"document.forms.form1.ryearID.value={str(self.rel_year).lstrip('0')};"
             )
-            self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value={str(self.minis_code)};"
+            self.jmin = f"document.forms.form1.minID.value={str(self.minis_code)};"
             self.jday = (
                 f"document.forms.form1.rdateID.value={str(self.rel_day).lstrip('0')};"
             )
