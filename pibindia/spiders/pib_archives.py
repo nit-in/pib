@@ -52,7 +52,7 @@ class PibSpider(scrapy.Spider):
                 f"document.forms.form1.rdateID.value={str(self.rel_day).lstrip('0')};"
             )
             self.jmon = f"document.forms.form1.rmonthID.value={str(self.rel_month).lstrip('0')};"
-            self.submit = f"datewise()"
+            self.submit = f"document.forms.form1.submit()"
             self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
             yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
 
