@@ -1,5 +1,4 @@
 import scrapy
-from scrapy_selenium import SeleniumRequest
 from pathlib import Path
 import requests
 from datetime import datetime
@@ -8,27 +7,21 @@ import re
 import platform
 import html
 from unicodedata import normalize
+from scrapy import FormRequest
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
 url = "https://archive.pib.gov.in/archive2/erelease.aspx"
 pib_url = "https://archive.pib.gov.in/newsite/PrintRelease.aspx?relid="
 cwd = Path.cwd()
-chromedriver = "selenium/chromedriver"
-chromedriver_path = Path(cwd, chromedriver).expanduser()
 platform_release = str(platform.release())
 today = datetime.today()
 
 
 class PibSpider(scrapy.Spider):
     name = "pib_archives"
-    allowed_domains = ["pib.gov.in"]
+    start_urls = ["https://archive.pib.gov.in/archive2/erelease.aspx"]
 
-    custom_settings = {
-        "DUPEFILTER_CLASS": "scrapy.dupefilters.BaseDupeFilter",
-        "SELENIUM_DRIVER_EXECUTABLE_PATH": str(chromedriver_path),
-    }
-
-    def start_requests(self):
+    def parse(self, response):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
         self.minis_code = self.rel_mincode
@@ -44,19 +37,19 @@ class PibSpider(scrapy.Spider):
             self.rel_month = self.strp_date.strftime("%m")
             self.rel_year = self.strp_date.strftime("%Y")
             self.pib_date = self.strp_date.strftime("%Y/%b/%d")
-            self.jyr = (
-                f"document.forms.form1.ryearID.value={str(self.rel_year).lstrip('0')};"
+            self.one = "1|"
+            self.jyr = f"{str(self.rel_year).lstrip('0')}|"
+            self.jmin = f"{str(self.minis_code)}"
+            self.jday = f"{str(self.rel_day).lstrip('0')}|"
+            self.jmon = f"{str(self.rel_month).lstrip('0')}|"
+            self.jsub = self.one + self.jday + self.jmon + self.jyr + self.jmin
+            print(self.jsub)
+            pib_data = {"__CALLBACKID": "__Page", "__CALLBACKPARAM": str(self.jsub)}
+            yield FormRequest.from_response(
+                response, formdata=pib_data, callback=self.parse_asp
             )
-            self.jmin = f"document.forms.form1.minID.value={str(self.minis_code)};"
-            self.jday = (
-                f"document.forms.form1.rdateID.value={str(self.rel_day).lstrip('0')};"
-            )
-            self.jmon = f"document.forms.form1.rmonthID.value={str(self.rel_month).lstrip('0')};"
-            self.submit = f"document.forms.form1.submit()"
-            self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
-            yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
 
-    def parse_js(self, response):
+    def parse_asp(self, response):
         # for i in response.xpath("//div[contains(@class,'content-area')]/ul[contains(@class,'num')]"): #response.css("div.content-area ul.num"):
         # 	print(i.xpath("//h3").extract(),i.xpath("//li/a[contains(@href,'PRID')]").extract(),i.xpath("//h3/following-sibling").extract())
         for articles in response.xpath("//li[contains(@onclick,'Getrelease')]"):
@@ -75,7 +68,7 @@ class PibSpider(scrapy.Spider):
             pib_title = pib_title_re + "_" + str(pib_prid) + ".pdf"
 
             pib_min_unnorm = str(
-                articles.xpath("..//preceding-sibling::li/text()").get()
+                articles.xpath("..//preceding-sibling::li[1]/text()").get()
             )
             pib_min_norm = self.remove_html_entities(pib_min_unnorm)
             pib_min_un = (
@@ -87,7 +80,8 @@ class PibSpider(scrapy.Spider):
             )
             pib_min = re.sub("[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_min_un)
             pib_prlink = str(pib_url) + str(pib_prid)
-            # print(self.pib_date,pib_min,pib_title,pib_prlink,sep="\n",end="\n\n\n")
+
+            print(self.pib_date, pib_min, pib_title, pib_prlink, sep="\n", end="\n\n\n")
             self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
 
     def txtfile(self, txtfilepath, art_link):
