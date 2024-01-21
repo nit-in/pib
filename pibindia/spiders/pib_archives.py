@@ -1,5 +1,4 @@
 import scrapy
-from scrapy_selenium import SeleniumRequest
 from pathlib import Path
 import requests
 from datetime import datetime
@@ -8,31 +7,25 @@ import re
 import platform
 import html
 from unicodedata import normalize
+from scrapy import FormRequest
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
-url = "https://pib.gov.in/AllRelease.aspx"
-pib_url = "https://pib.gov.in/PressReleaseIframePage.aspx?PRID="
+url = "https://archive.pib.gov.in/archive2/erelease.aspx"
+pib_url = "https://archive.pib.gov.in/newsite/PrintRelease.aspx?relid="
 cwd = Path.cwd()
-chromedriver = "selenium/chromedriver"
-chromedriver_path = Path(cwd, chromedriver).expanduser()
 platform_release = str(platform.release())
 today = datetime.today()
 
 
 class PibSpider(scrapy.Spider):
-    name = "pib_ddmin"
-    allowed_domains = ["pib.gov.in"]
+    name = "pib_archives"
+    start_urls = ["https://archive.pib.gov.in/archive2/erelease.aspx"]
 
-    custom_settings = {
-        "DUPEFILTER_CLASS": "scrapy.dupefilters.BaseDupeFilter",
-        "SELENIUM_DRIVER_EXECUTABLE_PATH": str(chromedriver_path),
-    }
-
-    def start_requests(self):
+    def parse(self, response):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
         self.minis_code = self.rel_mincode
-        
+
         if (
             self.strp_date.date() == today.date()
             and "azure" in platform_release.lower()
@@ -44,22 +37,23 @@ class PibSpider(scrapy.Spider):
             self.rel_month = self.strp_date.strftime("%m")
             self.rel_year = self.strp_date.strftime("%Y")
             self.pib_date = self.strp_date.strftime("%Y/%b/%d")
-            self.jyr = f"document.forms.form1.ContentPlaceHolder1_ddlYear.value={str(self.rel_year).lstrip('0')};"
-            self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value={str(self.minis_code)};"
-            self.jday = f"document.forms.form1.ContentPlaceHolder1_ddlday.value={str(self.rel_day).lstrip('0')};"
-            self.jmon = f"document.forms.form1.ContentPlaceHolder1_ddlMonth.value={str(self.rel_month).lstrip('0')};"
-            self.submit = f"document.forms.form1.submit()"
-            self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
-            yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
+            self.one = "1|"
+            self.jyr = f"{str(self.rel_year).lstrip('0')}|"
+            self.jmin = f"{str(self.minis_code)}"
+            self.jday = f"{str(self.rel_day).lstrip('0')}|"
+            self.jmon = f"{str(self.rel_month).lstrip('0')}|"
+            self.jsub = self.one + self.jday + self.jmon + self.jyr + self.jmin
+            pib_data = {"__CALLBACKID": "__Page", "__CALLBACKPARAM": str(self.jsub)}
+            yield FormRequest.from_response(
+                response, formdata=pib_data, callback=self.parse_asp
+            )
 
-    def parse_js(self, response):
+    def parse_asp(self, response):
         # for i in response.xpath("//div[contains(@class,'content-area')]/ul[contains(@class,'num')]"): #response.css("div.content-area ul.num"):
         # 	print(i.xpath("//h3").extract(),i.xpath("//li/a[contains(@href,'PRID')]").extract(),i.xpath("//h3/following-sibling").extract())
-        for articles in response.xpath(
-            "//div[contains(@class,'content-area')]/ul[contains(@class,'num')]/li/a[contains(@href,'PRID')]"
-        ):
-            pib_prid = str(articles.xpath("@href").get()).split("=", 1)[1]
-            pib_title_unnorm = str(articles.xpath("@title").get())[:90]
+        for articles in response.xpath("//li[contains(@onclick,'Getrelease')]"):
+            pib_prid = str(articles.xpath("@id").get())
+            pib_title_unnorm = str(articles.xpath("text()").get())[:90]
             pib_title_norm = self.remove_html_entities(pib_title_unnorm)
             pib_title_un = (
                 str(pib_title_norm)
@@ -73,7 +67,7 @@ class PibSpider(scrapy.Spider):
             pib_title = pib_title_re + "_" + str(pib_prid) + ".pdf"
 
             pib_min_unnorm = str(
-                articles.xpath("..//preceding-sibling::h3[1]/text()").get()
+                articles.xpath("..//preceding-sibling::li[1]/text()").get()
             )
             pib_min_norm = self.remove_html_entities(pib_min_unnorm)
             pib_min_un = (
@@ -85,7 +79,8 @@ class PibSpider(scrapy.Spider):
             )
             pib_min = re.sub("[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_min_un)
             pib_prlink = str(pib_url) + str(pib_prid)
-            # print(self.pib_date,pib_min,pib_title,pib_prlink,sep="\n",end="\n\n\n")
+
+#            print(self.pib_date, pib_min, pib_title, pib_prlink, sep="\n", end="\n\n\n")
             self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
 
     def txtfile(self, txtfilepath, art_link):
@@ -94,7 +89,7 @@ class PibSpider(scrapy.Spider):
             txtfilep.touch(exist_ok=True)
 
         if not art_link in txtfilep.read_text():
-            with open(str(txtfilep), 'a') as tfile:
+            with open(str(txtfilep), "a") as tfile:
                 tfile.write(str(art_link))
                 tfile.write("\n")
 
@@ -119,7 +114,7 @@ class PibSpider(scrapy.Spider):
         text_date = text_art_date.strftime("%d_%b_%Y")
         textf_name = "PIB_LINKS_" + str(text_date) + ".txt"
         textf_path = Path(pib_links_path, str(textf_name)).expanduser()
-        
+
         pdf_path = Path(min_path, art_title).expanduser()
         self.txtfile(str(textf_path), str(art_link))
         ops = {
@@ -146,5 +141,3 @@ class PibSpider(scrapy.Spider):
         str_html = html.unescape(str(txt))
         str_normalized = normalize("NFKD", str_html)
         return str(str_normalized)
-
-

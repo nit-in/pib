@@ -85,7 +85,7 @@ class PibSpider(scrapy.Spider):
             txtfilep.touch(exist_ok=True)
 
         if not art_link in txtfilep.read_text():
-            with open(str(txtfilep), 'a') as tfile:
+            with open(str(txtfilep), "a") as tfile:
                 tfile.write(str(art_link))
                 tfile.write("\n")
 
