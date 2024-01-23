@@ -79,8 +79,7 @@ class PibSpider(scrapy.Spider):
             )
             pib_min = re.sub("[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_min_un)
             pib_prlink = str(pib_url) + str(pib_prid)
-
-#            print(self.pib_date, pib_min, pib_title, pib_prlink, sep="\n", end="\n\n\n")
+            #            print(self.pib_date, pib_min, pib_title, pib_prlink, sep="\n", end="\n\n\n")
             self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
 
     def txtfile(self, txtfilepath, art_link):

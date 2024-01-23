@@ -1,5 +1,5 @@
 import scrapy
-from scrapy_selenium import SeleniumRequest
+from scrapy import FormRequest
 from pathlib import Path
 import requests
 from datetime import datetime
@@ -13,37 +13,42 @@ from unicodedata import normalize
 url = "https://pib.gov.in/AllRelease.aspx"
 pib_url = "https://pib.gov.in/PressReleaseIframePage.aspx?PRID="
 cwd = Path.cwd()
-chromedriver = "selenium/chromedriver"
-chromedriver_path = Path(cwd, chromedriver).expanduser()
+
 platform_release = str(platform.release())
 today = datetime.today()
 
 
 class PibSpider(scrapy.Spider):
     name = "pib_daily"
-    allowed_domains = ["pib.gov.in"]
+    start_urls = ["https://pib.gov.in/AllRelease.aspx"]
 
-    custom_settings = {
-        "DUPEFILTER_CLASS": "scrapy.dupefilters.BaseDupeFilter",
-        "SELENIUM_DRIVER_EXECUTABLE_PATH": str(chromedriver_path),
-    }
-
-    def start_requests(self):
+    def parse(self, response):
         # self.rel_date = self.rel_date_fn()
         self.strp_date = datetime.strptime(self.rel_date, "%Y-%m-%d")
         self.rel_day = self.strp_date.strftime("%d")
         self.rel_month = self.strp_date.strftime("%m")
         self.rel_year = self.strp_date.strftime("%Y")
         self.pib_date = self.strp_date.strftime("%Y/%b/%d")
-        self.jyr = f"document.forms.form1.ContentPlaceHolder1_ddlYear.value={str(self.rel_year).lstrip('0')};"
-        self.jmin = f"document.forms.form1.ContentPlaceHolder1_ddlMinistry.value=0;"
-        self.jday = f"document.forms.form1.ContentPlaceHolder1_ddlday.value={str(self.rel_day).lstrip('0')};"
-        self.jmon = f"document.forms.form1.ContentPlaceHolder1_ddlMonth.value={str(self.rel_month).lstrip('0')};"
-        self.submit = f"document.forms.form1.submit()"
-        self.jsub = self.jmin + self.jday + self.jmon + self.jyr + self.submit
-        yield SeleniumRequest(url=url, callback=self.parse_js, script=self.jsub)
+        self.jyr = "ctl00$ContentPlaceHolder1$ddlYear"
+        self.jyrvalue = str(self.rel_year).lstrip("0")
+        self.jmin = "ctl00$ContentPlaceHolder1$ddlMinistry"
+        self.jminvalue = "0"
+        self.jday = "ctl00$ContentPlaceHolder1$ddlday"
+        self.jdayvalue = str(self.rel_day).lstrip("0")
+        self.jmon = "ctl00$ContentPlaceHolder1$ddlMonth"
+        self.jmonvalue = str(self.rel_month).lstrip("0")
 
-    def parse_js(self, response):
+        pib_data = {
+            str(self.jmin): str(self.jminvalue),
+            str(self.jday): str(self.jdayvalue),
+            str(self.jmon): str(self.jmonvalue),
+            str(self.jyr): str(self.jyrvalue),
+        }
+        yield FormRequest.from_response(
+            response, formdata=pib_data, callback=self.parse_asp
+        )
+
+    def parse_asp(self, response):
         # for i in response.xpath("//div[contains(@class,'content-area')]/ul[contains(@class,'num')]"): #response.css("div.content-area ul.num"):
         # 	print(i.xpath("//h3").extract(),i.xpath("//li/a[contains(@href,'PRID')]").extract(),i.xpath("//h3/following-sibling").extract())
         for articles in response.xpath(
@@ -76,7 +81,7 @@ class PibSpider(scrapy.Spider):
             )
             pib_min = re.sub("[`~!@#$%^&*();:',.+=\"<>|\\/?\n\t\r ]", "", pib_min_un)
             pib_prlink = str(pib_url) + str(pib_prid)
-            # print(self.pib_date,pib_min,pib_title,pib_prlink,sep="\n",end="\n\n\n")
+            #            print(self.pib_date, pib_min, pib_title, pib_prlink, sep="\n", end="\n\n\n")
             self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
 
     def txtfile(self, txtfilepath, art_link):
