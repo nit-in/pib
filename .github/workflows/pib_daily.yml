@@ -49,7 +49,6 @@ jobs:
       - name: run script
         run:  |
           source .env
-          dwngrd_chrome
           pib_today || err_handle "10" "PIB_TODAY running failed"
           pib_last_day || err_handle "10" "PIB_LAST_DAY running failed"
 
