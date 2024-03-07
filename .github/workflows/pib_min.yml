@@ -176,7 +176,7 @@ jobs:
           done
 
       - name: Create Monthly zip
-        uses: ncipollo/release-action@v1.13.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           artifacts: "/home/runner/zips/monthly/*.zip"
           token: ${{ secrets.PIB }}
@@ -185,7 +185,7 @@ jobs:
           body : "PIB articles from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
 
       - name: Create Daily zips
-        uses: ncipollo/release-action@v1.13.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           artifacts: "/home/runner/zips/daily/*.zip"
           token: ${{ secrets.PIB }}
@@ -194,7 +194,7 @@ jobs:
           body : "PIB articles (by date) from ${{ inputs.intialDate }} to ${{ inputs.lastDate }}"
 
       - name: Create Link text files
-        uses: ncipollo/release-action@v1.13.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           artifacts: "/home/runner/piblinks/*.txt"
           token: ${{ secrets.PIB }}
