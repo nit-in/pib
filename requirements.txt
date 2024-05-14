@@ -1,4 +1,4 @@
 itemadapter==0.8.0
 pdfkit==1.0.0
 Requests==2.31.0
-Scrapy==2.11.1
+Scrapy==2.11.2
