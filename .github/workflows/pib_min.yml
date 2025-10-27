@@ -167,7 +167,7 @@ jobs:
           source .env
           cd /home/runner/pib/json_dir/
           ls -lah
-          cat *.json > PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json
+          cat $(ls PIB_JSON_*_*_*.json | grep -v "^PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json$") > PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json || cat *.json >> PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json
 
       - name: zipup_months_articles
         run:  |

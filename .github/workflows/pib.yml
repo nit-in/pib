@@ -41,6 +41,8 @@ jobs:
           cd /home/runner
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Monthly_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" || err_handle "11" "Error downloading PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
           unzip "PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip" -d /home/runner/pib/articles/${{ env.PIB_YEAR }} || err_handle "12" "Error unzipping PIB_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.zip"
+          cd /home/runner/pib/json_dir
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json" || err_handle "12" "Json file download failed"
 
       - name: run script
         run:  |
@@ -84,7 +86,7 @@ jobs:
         run:  |
           source .env
           cd /home/runner/pib/json_dir/
-          cat *.json > PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json
+          cat $(ls PIB_JSON_*_*_*.json | grep -v "^PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json$") > PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json
 
       - name: Create Monthly zip
         uses: ncipollo/release-action@v1.14.0

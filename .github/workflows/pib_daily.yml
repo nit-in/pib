@@ -47,6 +47,8 @@ jobs:
           lnkfile="PIB_LINKS_${tday}.txt"
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}" || err_handle "14" "Failed to download PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}"
           mv ${lnkfile} /home/runner/pib/article_links/${lnkfile} || err_handle "16" "Failed to copy ${lnkfile}"
+          cd /home/runner/pib/json_dir
+          wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json" || err_handle "12" "Json file download failed"
           
       - name: run script
         run:  |
@@ -91,7 +93,7 @@ jobs:
         run:  |
           source .env
           cd /home/runner/pib/json_dir/
-          cat *.json > PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json
+          cat $(ls PIB_JSON_*_*_*.json | grep -v "^PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json$") > PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json
 
       - name: Create Monthly zip
         uses: ncipollo/release-action@v1.14.0
