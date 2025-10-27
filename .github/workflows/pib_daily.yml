@@ -47,6 +47,7 @@ jobs:
           lnkfile="PIB_LINKS_${tday}.txt"
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}" || err_handle "14" "Failed to download PIB_Links_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/${lnkfile}"
           mv ${lnkfile} /home/runner/pib/article_links/${lnkfile} || err_handle "16" "Failed to copy ${lnkfile}"
+          mkdir -p /home/runner/pib/json_dir
           cd /home/runner/pib/json_dir
           wget -q -c "https://github.com/nit-in/pib/releases/download/PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}/PIB_JSON_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.json" || err_handle "12" "Json file download failed"
           
