@@ -117,4 +117,4 @@ class PibSpider(scrapy.Spider):
         save_json(jfpath, pib_json_data)
 
         pdf_path = make_file_path(min_path, art_title)
-        # download_article(pdf_path, art_link)
+        download_article(pdf_path, art_link)
