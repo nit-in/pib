@@ -14,6 +14,7 @@ def make_file_path(base_path, filename):
 def touch_file(filepath):
     fpath = Path(filepath).expanduser()
     if not fpath.exists():
+        print(f"Touching file {fpath}\n")
         fpath.touch(exist_ok=True)
 
 
@@ -21,6 +22,7 @@ def edit_file(filename, data):
     fpath = Path(filename).expanduser()
     if not data in fpath.read_text():
         with open(fpath, "a") as f:
+            print(f"Adding {data} to file {fpath}\n")
             f.write(str(data))
             f.write("\n")
 
@@ -28,4 +30,5 @@ def edit_file(filename, data):
 def delete_file(filename):
     fpath = Path(filename).expanduser()
     if fpath.exists():
+        print(f"Deleting file {fpath}\n")
         fpath.unlink()
