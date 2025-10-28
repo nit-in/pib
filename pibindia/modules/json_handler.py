@@ -16,4 +16,3 @@ def article_jdata(prid, article_date, article_title, article_ministry, article_u
 def save_json(jpath, article_data):
     with open(jpath, "a", encoding="utf-8") as j:
         json.dump(article_data, j, ensure_ascii=False, indent=4)
-        print(f"Added {article_data} to file {jpath}")

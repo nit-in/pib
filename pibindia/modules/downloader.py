@@ -19,7 +19,7 @@ def download_article(pib_pdf_path, art_link):
         "javascript-delay": "2000",
     }
     if pdf_path.exists():
-        print(f"{pdf_path} already downloded.")
+        print(f"{pdf_path} already downloded.\n")
     else:
-        print(f"downloading {pdf_path} ....")
+        print(f"downloading {pdf_path} ....\n")
         pdfkit.from_url(str(art_link), str(pdf_path), options=ops)
