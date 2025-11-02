@@ -122,9 +122,12 @@ on:
 
 
 jobs:
-
   pib_articles:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -136,9 +139,9 @@ jobs:
           sudo apt update
           sudo apt install --fix-missing -y python3 wkhtmltopdf fd-find poppler-utils
           sudo ln -s $(which fdfind) /usr/bin/fd
-          sudo pip install -r requirements.txt
+          sudo pip install -r requirements.txt --ignore-installed
           mkdir -p /home/runner/zips/{text,monthly,daily}
-          sudo pip install -U pyopenssl cryptography || echo "upgrade failed"
+          sudo pip install -U pyopenssl cryptography --ignore-installed || echo "upgrade failed"
           
       - name: set env
         run:  |
@@ -148,6 +151,7 @@ jobs:
       - name: run script
         run:  |
           source .env
+          export SUMMARY="True"
           pib_min ${{ inputs.intialDate }} ${{ inputs.lastDate }} ${{ inputs.ministrycode }} || err_handle "10" "Spider failed to run"
 
       - name: make txt files
