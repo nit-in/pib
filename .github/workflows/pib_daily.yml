@@ -8,9 +8,12 @@ on:
   workflow_dispatch:
 
 jobs:
-
   pib_articles:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -54,6 +57,7 @@ jobs:
       - name: run script
         run:  |
           source .env
+          export SUMMARY="True"
           pib_today || err_handle "10" "PIB_TODAY running failed"
           pib_last_day || err_handle "10" "PIB_LAST_DAY running failed"
 

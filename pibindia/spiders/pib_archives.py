@@ -4,12 +4,14 @@ import requests
 from datetime import datetime
 import platform
 from scrapy import FormRequest
+import os
 import pibindia.spiders.config as config
 from pibindia.modules.utils import *
 from pibindia.modules.date_handler import *
 from pibindia.modules.file_handler import *
 from pibindia.modules.json_handler import *
 from pibindia.modules.downloader import *
+from pibindia.modules.tg_summary import *
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
 url = "https://archive.pib.gov.in/archive2/erelease.aspx"
@@ -108,4 +110,8 @@ class PibSpider(scrapy.Spider):
         save_json(jfpath, pib_json_data)
 
         pdf_path = make_file_path(min_path, art_title)
+        if os.getenv("SUMMARY"):
+            page_html = get_text(art_link)
+            summary_post = summarize_text(page_html)
+            post_to_telegram(summary_post)
         download_article(pdf_path, art_link)
