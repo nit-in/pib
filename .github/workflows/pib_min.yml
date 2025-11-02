@@ -139,9 +139,9 @@ jobs:
           sudo apt update
           sudo apt install --fix-missing -y python3 wkhtmltopdf fd-find poppler-utils
           sudo ln -s $(which fdfind) /usr/bin/fd
-          sudo pip install -r requirements.txt
+          sudo pip install -r requirements.txt --ignore-installed
           mkdir -p /home/runner/zips/{text,monthly,daily}
-          sudo pip install -U pyopenssl cryptography || echo "upgrade failed"
+          sudo pip install -U pyopenssl cryptography --ignore-installed || echo "upgrade failed"
           
       - name: set env
         run:  |
