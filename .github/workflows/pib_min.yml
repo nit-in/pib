@@ -132,7 +132,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache pip and llama-cpp build
+        id: cache-pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/llama_cpp
+            /home/runner/.cache/llama_cpp
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache TinyLlama model
+        id: cache-tinyllama
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/pib/models/tinyllama.gguf
+          key: ${{ runner.os }}-tinyllama-1.1b-v1.0
+
       - name: setting_up
+        if: steps.cache-pip.outputs.cache-hit != 'true'
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run:  |
@@ -142,13 +162,14 @@ jobs:
           sudo ln -s $(which fdfind) /usr/bin/fd
           sudo pip install -r requirements.txt --ignore-installed
           mkdir -p /home/runner/zips/{text,monthly,daily}
-          mkdir -p /home/runner/pib/models
           sudo pip install -U pyopenssl cryptography --ignore-installed || echo "upgrade failed"
           pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
 
       - name: Download TinyLlama model if missing
+        if: steps.cache-tinyllama.outputs.cache-hit != 'true'
         run: |
           predir=$(pwd)
+          mkdir -p ${predir}/models
           if [ ! -f ${predir}/models/tinyllama.gguf ]; then
             echo "Downloading TinyLlama GGUF model..."
             wget -O "${predir}/models/tinyllama.gguf" https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
