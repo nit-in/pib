@@ -38,7 +38,7 @@ jobs:
           key: ${{ runner.os }}-mistral-7b-instruct-v0.2-q4km
 
       - name: setting_up
-        if: steps.cache-pip.outputs.cache-hit != 'true'
+        if: always()
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         run: |
