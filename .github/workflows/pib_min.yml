@@ -131,6 +131,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Cache pip and llama-cpp build
         id: cache-pip
         uses: actions/cache@v4
@@ -142,6 +143,13 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+
+      - name: Restore Scrapy executables to PATH
+        run: |
+          echo "Restoring Python user bin to PATH"
+          export PATH="$PATH:$(python3 -m site --user-base)/bin"
+          which scrapy || pip install scrapy --no-cache-dir
+
 
       - name: Cache Mistral model
         id: cache-mistral
