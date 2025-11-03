@@ -39,10 +39,26 @@ def escape_md(text):
 
 
 def summarize_text(text):
-    prompt = f"""Summarize the following PIB press releases for UPSC and other competitive exams.
-Keep it concise, factual, Non-repetitive with less words and best formatted for Telegram (bullet points, emojis if needed).
-Focus on names, numbers, dates, ministries, initiatives, and key takeaways.\n\n
-Release:
+    prompt = prompt = f"""
+Summarize ONLY the provided PIB press release text.
+
+🎯 Guidelines:
+- Write for UPSC and other competitive exams.
+- Be concise, factual, and to the point.
+- Ignore all external links, references, or other PIB releases.
+- DO NOT include unrelated or speculative information.
+- Focus strictly on the provided text content.
+
+🧾 Format for Telegram:
+• Use bullet points (•)
+• Include emojis for readability (📅🏛️📊👥💡📈)
+• Highlight key facts, dates, numbers, names, schemes, and ministries.
+• Avoid repetition or unnecessary words.
+• Maintain neutral, official tone.
+
+Output must be short, clear, and ready to post.
+
+Text:
 {text}
 """
     result = llm(prompt, max_tokens=350, temperature=0.3, top_p=0.95)
