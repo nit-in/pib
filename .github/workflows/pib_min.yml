@@ -148,9 +148,10 @@ jobs:
 
       - name: Download TinyLlama model if missing
         run: |
-          if [ ! -f models/tinyllama.gguf ]; then
+          echo $(pwd)
+          if [ ! -f /home/runner/pib/models/tinyllama.gguf ]; then
             echo "Downloading TinyLlama GGUF model..."
-            wget -O models/tinyllama.gguf https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+            wget -O /home/runner/pib/models/tinyllama.gguf https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
           fi
 
       - name: set env
@@ -162,6 +163,7 @@ jobs:
         run:  |
           source .env
           export SUMMARY="True"
+          echo $(pwd)
           pib_min ${{ inputs.intialDate }} ${{ inputs.lastDate }} ${{ inputs.ministrycode }} || err_handle "10" "Spider failed to run"
 
       - name: make txt files
