@@ -144,13 +144,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Restore Scrapy executables to PATH
-        run: |
-          echo "Restoring Python user bin to PATH"
-          export PATH="$PATH:$(python3 -m site --user-base)/bin"
-          which scrapy || pip install scrapy --no-cache-dir
-
-
       - name: Cache Mistral model
         id: cache-mistral
         uses: actions/cache@v4
