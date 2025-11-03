@@ -8,7 +8,9 @@ import re
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-llm = Llama(model_path="models/tinyllama.gguf", n_ctx=2048)
+llm = Llama(
+    model_path="models/mistral-7b-instruct-v0.2.Q4_K_M.gguf", n_ctx=4096, n_threads=4
+)
 
 
 def get_text(url):
@@ -40,7 +42,7 @@ Use Telegram Markdown for better presentation — use bullets, headings, subhead
 Text:
 {text}
 """
-    result = llm(prompt, max_tokens=300, temperature=0.3)
+    result = llm(prompt, max_tokens=512, temperature=0.4, top_p=0.9)
     return result["choices"][0]["text"].strip()
 
 
