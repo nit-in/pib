@@ -8,7 +8,14 @@ import re
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-llm = Llama(model_path="models/tinyllama.gguf", n_ctx=2048)
+llm = Llama(
+    model_path="models/mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+    n_ctx=2048,
+    n_threads=2,
+    n_batch=128,
+    use_mlock=True,
+    verbose=False
+)
 
 
 def get_text(url):
@@ -33,14 +40,12 @@ def escape_md(text):
 
 def summarize_text(text):
     prompt = f"""Summarize the following PIB press releases for UPSC and other competitive exams.
-Keep it concise, factual, and formatted for Telegram (bullet points, emojis if needed).
-Focus on names, numbers, dates, ministries, initiatives, and key takeaways.
-Use Telegram Markdown for better presentation — use bullets, headings, subheadings.
-
-Text:
+Keep it concise, factual, Non-repetitive with less words and best formatted for Telegram (bullet points, emojis if needed).
+Focus on names, numbers, dates, ministries, initiatives, and key takeaways.\n\n
+Release:
 {text}
 """
-    result = llm(prompt, max_tokens=300, temperature=0.3)
+    result = llm(prompt, max_tokens=350, temperature=0.3, top_p=0.95)
     return result["choices"][0]["text"].strip()
 
 

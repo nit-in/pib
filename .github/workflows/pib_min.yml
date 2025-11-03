@@ -132,25 +132,49 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache pip and llama-cpp build
+        id: cache-pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.cache/llama_cpp
+            /home/runner/.cache/llama_cpp
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache Mistral model
+        id: cache-mistral
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/models/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+          key: ${{ runner.os }}-mistral-7b-instruct-v0.2-q4km
+
       - name: setting_up
+        if: steps.cache-pip.outputs.cache-hit != 'true'
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        run:  |
+        run: |
           echo "set man-db/auto-update false" | sudo debconf-communicate dpkg-reconfigure man-db
           sudo apt update
           sudo apt install --fix-missing -y python3 wkhtmltopdf fd-find poppler-utils
           sudo ln -s $(which fdfind) /usr/bin/fd
           sudo pip install -r requirements.txt --ignore-installed
           mkdir -p /home/runner/zips/{text,monthly,daily}
-          mkdir -p /home/runner/pib/models
+          mkdir -p /home/runner/pib/{article_links,articles,json_dir}
           sudo pip install -U pyopenssl cryptography --ignore-installed || echo "upgrade failed"
           pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
 
-      - name: Download TinyLlama model if missing
+      - name: Download Mistral model if missing
+        if: steps.cache-mistral.outputs.cache-hit != 'true'
         run: |
-          if [ ! -f models/tinyllama.gguf ]; then
-            echo "Downloading TinyLlama GGUF model..."
-            wget -O models/tinyllama.gguf https://huggingface.co/TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf
+          predir=$(pwd)
+          mkdir -p ${predir}/models
+          if [ ! -f ${predir}/models/mistral-7b-instruct-v0.2.Q4_K_M.gguf ]; then
+            echo "Downloading Mistral-7B-Instruct-v0.2 model..."
+            wget -O "${predir}/models/mistral-7b-instruct-v0.2.Q4_K_M.gguf" \
+              https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf
           fi
 
       - name: set env
@@ -162,6 +186,7 @@ jobs:
         run:  |
           source .env
           export SUMMARY="True"
+          echo $(pwd)
           pib_min ${{ inputs.intialDate }} ${{ inputs.lastDate }} ${{ inputs.ministrycode }} || err_handle "10" "Spider failed to run"
 
       - name: make txt files
@@ -174,7 +199,7 @@ jobs:
           source .env
           cd /home/runner/pib/article_links/
           ls -lah
-          cat *.txt > PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.txt
+          cat *.txt > PIB_TEXT_${{ env.PIB_MONTH }}_${{ env.PIB_YEAR }}.txt || echo "links do not exists"
 
       - name: cat_json
         run:  |
