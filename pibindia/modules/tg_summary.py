@@ -1,49 +1,63 @@
 import os
 import requests
-from openai import OpenAI
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+from llama_cpp import Llama
+from scrapy.selector import Selector
+import re
+
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+llm = Llama(model_path="models/tinyllama.gguf", n_ctx=2048)
 
 
 def get_text(url):
     try:
         response = requests.get(url)
         response.raise_for_status()
-        html_content = response.text
+        sel = Selector(text=response.text)
+        content = sel.xpath(
+            "//div[contains(@class,'innner-page-main-about-us-content-right-part')]//text()[normalize-space()] | //div[@id='PRBody']//text()[normalize-space()]"
+        ).getall()
+        cleaned_text = " ".join([t.strip() for t in content if t.strip()])
+        print(cleaned_text)
+        return cleaned_text
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        print(f"Error fetching URL: {e}")
+        return None
+
+
+def escape_md(text):
+    return re.sub(r"([_*\[\]()~`>#+\-=|{}.!])", r"\\\1", text)
 
 
 def summarize_text(text):
-    prompt = f"""Summarize and strip html the following PIB press releases/html for UPSC and other competitive exams.
+    prompt = f"""Summarize the following PIB press releases for UPSC and other competitive exams.
 Keep it concise, factual, and formatted for Telegram (bullet points, emojis if needed).
 Focus on names, numbers, dates, ministries, initiatives, and key takeaways.
+Use Telegram Markdown for better presentation — use bullets, headings, subheadings.
 
 Text:
 {text}
 """
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3,
-    )
-    return response.choices[0].message.content.strip()
+    result = llm(prompt, max_tokens=300, temperature=0.3)
+    return result["choices"][0]["text"].strip()
 
 
 def post_to_telegram(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    safe_message = escape_md(message)
     payload = {
         "chat_id": TELEGRAM_CHAT_ID,
-        "text": message,
-        "parse_mode": "Markdown",
+        "text": safe_message,
+        "parse_mode": "MarkdownV2",
         "disable_web_page_preview": True,
     }
-    res = requests.post(url, data=payload)
-    if res.status_code != 200:
-        print("Telegram Error:", res.text)
-    else:
-        print("Summary sent successfully!")
+    for attempt in range(3):
+        res = requests.post(url, data=payload)
+        if res.status_code == 200:
+            print("Summary sent successfully!")
+            return True
+        else:
+            print(f"Telegram Error (Attempt {attempt+1}): {res.text}")
+    return False
