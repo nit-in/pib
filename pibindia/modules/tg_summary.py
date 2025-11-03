@@ -44,19 +44,19 @@ Summarize ONLY the provided PIB press release text.
 
 🎯 Guidelines:
 - Write for UPSC and other competitive exams.
-- Be concise, factual, and to the point.
+- Keep it very precise and very concise, factual, and to the point.
 - Ignore all external links, references, or other PIB releases.
 - DO NOT include unrelated or speculative information.
 - Focus strictly on the provided text content.
 
 🧾 Format for Telegram:
 • Use bullet points (•)
-• Include emojis for readability (📅🏛️📊👥💡📈)
+• Include relevant emojis in every post for readability (📅🏛️📊👥💡📈)
 • Highlight key facts, dates, numbers, names, schemes, and ministries.
 • Avoid repetition or unnecessary words.
 • Maintain neutral, official tone.
 
-Output must be short, clear, and ready to post.
+Output must be short very precise and very concise , clear, and ready to post.
 
 Text:
 {text}
