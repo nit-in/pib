@@ -109,9 +109,12 @@ class PibSpider(scrapy.Spider):
         delete_file(jfpath)
         save_json(jfpath, pib_json_data)
 
+
         pdf_path = make_file_path(min_path, art_title)
+        print(pdf_path)
         if os.getenv("SUMMARY"):
-            page_html = get_text(art_link)
-            summary_post = summarize_text(page_html)
-            post_to_telegram(summary_post)
+            if check_file(pdf_path):
+                page_html = get_text(art_link)
+                summary_post = summarize_text(page_html)
+                post_to_telegram(summary_post)
         download_article(pdf_path, art_link)
