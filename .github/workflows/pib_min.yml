@@ -24,10 +24,9 @@ on:
         type: string
 
       ministrycode:
-        description: 'Enter the ministry code
-(Find the ministry code from ministries.txt file)'
+        description: 'Enter the ministry code(Find the ministry code from ministries.txt file)'
         required: true
-        default: 0
+        default: "0"
         type: choice
         options:
         - 0
