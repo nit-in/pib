@@ -11,10 +11,14 @@ from pibindia.modules.date_handler import *
 from pibindia.modules.file_handler import *
 from pibindia.modules.json_handler import *
 from pibindia.modules.downloader import *
+
 if os.getenv("SUMMARY"):
     try:
         from pibindia.modules.tg_summary import *
-        print("tg_summary module loaded successfully — llama_cpp already handled internally (no manual import needed).")
+
+        print(
+            "tg_summary module loaded successfully — llama_cpp already handled internally (no manual import needed)."
+        )
     except ImportError:
         print(
             "Warning: tg_summary could not be imported.\n"
