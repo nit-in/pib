@@ -37,7 +37,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      
+
     steps:
       - uses: actions/checkout@v4
       - name: setting_up
@@ -57,8 +57,8 @@ jobs:
         run:  |
           echo ${{ inputs.month }}
           echo ${{ inputs.year }}
-          PIB_MONTH=${{ inputs.month }}
-          PIB_YEAR=${{ inputs.year }}
+          PIB_MONTH=${{ inputs.month }} >> $GITHUB_ENV
+          PIB_YEAR=${{ inputs.year }} >> $GITHUB_ENV
 
       - name: run script
         run:  |
