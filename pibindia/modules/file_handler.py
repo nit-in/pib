@@ -33,10 +33,11 @@ def delete_file(filename):
         print(f"Deleting file {fpath}\n")
         fpath.unlink()
 
-#returns false if a file exists
+
+# returns false if a file exists
 def check_file(path):
     fpath = Path(path).expanduser()
     if fpath.exists():
-        return False 
+        return False
     if not fpath.exists():
         return True

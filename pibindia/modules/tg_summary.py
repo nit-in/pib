@@ -1,8 +1,5 @@
 import os
-import requests
-
 from llama_cpp import Llama
-from scrapy.selector import Selector
 import re
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -14,24 +11,8 @@ llm = Llama(
     n_threads=2,
     n_batch=128,
     use_mlock=True,
-    verbose=False
+    verbose=False,
 )
-
-
-def get_text(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        sel = Selector(text=response.text)
-        content = sel.xpath(
-            "//div[contains(@class,'innner-page-main-about-us-content-right-part')]//text()[normalize-space()] | //div[@id='PRBody']//text()[normalize-space()]"
-        ).getall()
-        cleaned_text = " ".join([t.strip() for t in content if t.strip()])
-        print(cleaned_text)
-        return cleaned_text
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching URL: {e}")
-        return None
 
 
 def escape_md(text):
@@ -39,7 +20,7 @@ def escape_md(text):
 
 
 def summarize_text(text):
-    prompt = prompt = f"""
+    prompt = f"""
 Summarize ONLY the provided PIB press release text.
 
 🎯 Guidelines:

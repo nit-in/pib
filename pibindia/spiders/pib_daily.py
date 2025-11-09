@@ -9,7 +9,17 @@ from pibindia.modules.date_handler import *
 from pibindia.modules.file_handler import *
 from pibindia.modules.json_handler import *
 from pibindia.modules.downloader import *
-from pibindia.modules.tg_summary import *
+
+if os.getenv("SUMMARY"):
+    try:
+        from pibindia.modules.tg_summary import *
+    except Exception as e:
+        print(
+            f"Warning llama_cpp could not be imported or does not exists,\n\ninstall it with\n\npip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu"
+        )
+    else:
+        print(f"No need to import llama_cpp")
+from pibindia.modules.get_article import *
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
 url = "https://pib.gov.in/AllRelease.aspx"
@@ -80,15 +90,23 @@ class PibSpider(scrapy.Spider):
             pib_prlink = str(pib_url) + str(pib_prid)
 
             jdate = ddmmmyyyy(self.rel_date)
+            article_data = get_text(pib_prlink)
             pib_json_data.append(
                 article_jdata(
-                    pib_prid, jdate, pib_title_unnorm, pib_min_unnorm, pib_prlink
+                    pib_prid,
+                    jdate,
+                    pib_title_unnorm,
+                    pib_min_unnorm,
+                    pib_prlink,
+                    article_data,
                 )
             )
             #            print(self.pib_date, pib_min, pib_title, pib_prlink, sep="\n", end="\n\n\n")
-            self.download_article(pib_title, pib_prlink, pib_min, self.pib_date)
+            self.download_article(
+                pib_title, pib_prlink, pib_min, self.pib_date, article_data
+            )
 
-    def download_article(self, art_title, art_link, art_min, art_date):
+    def download_article(self, art_title, art_link, art_min, art_date, art_data):
 
         pib_dir = config.PIB_BASE_DIR
         pib_art_dir = config.PIB_ARTICLES_DIR
@@ -116,13 +134,14 @@ class PibSpider(scrapy.Spider):
         jfname = "PIB_JSON_" + str(tnj_date) + ".json"
         jfpath = make_file_path(pib_json, jfname)
         delete_file(jfpath)
-        save_json(jfpath, pib_json_data)
+        if is_valid_json(str(pib_json_data)):
+            save_json(jfpath, pib_json_data)
 
         pdf_path = make_file_path(min_path, art_title)
-        print(pdf_path)
         if os.getenv("SUMMARY"):
             if check_file(pdf_path):
-                page_html = get_text(art_link)
-                summary_post = summarize_text(page_html)
+                summary_post = summarize_text(art_data)
                 post_to_telegram(summary_post)
-        download_article(pdf_path, art_link)
+
+        if not os.getenv("ONLY_JSON"):
+            download_article(pdf_path, art_link)
