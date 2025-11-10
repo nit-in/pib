@@ -9,23 +9,7 @@ from pibindia.modules.date_handler import *
 from pibindia.modules.file_handler import *
 from pibindia.modules.json_handler import *
 from pibindia.modules.downloader import *
-import os
-
-if os.getenv("SUMMARY"):
-    try:
-        from pibindia.modules.tg_summary import *
-
-        print(
-            "tg_summary module loaded successfully — llama_cpp already handled internally (no manual import needed)."
-        )
-    except ImportError:
-        print(
-            "Warning: tg_summary could not be imported.\n"
-            "If it depends on llama_cpp, install it using:\n\n"
-            "pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu\n"
-        )
-    except Exception as e:
-        print(f"Unexpected error while importing tg_summary: {e}")
+from pibindia.modules.tg_summary import *
 from pibindia.modules.get_article import *
 
 # url = 'https://archive.pib.gov.in/archive2/erelease.aspx/'
@@ -145,8 +129,8 @@ class PibSpider(scrapy.Spider):
             save_json(jfpath, pib_json_data)
 
         pdf_path = make_file_path(min_path, art_title)
-        if os.getenv("SUMMARY"):
-            if check_file(pdf_path):
-                summary_post = summarize_text(art_data)
-                post_to_telegram(summary_post)
+        if check_file(pdf_path):
+            summary_post = summarize_text(art_data)
+            post_to_telegram(summary_post)
+
         download_article(pdf_path, art_link)

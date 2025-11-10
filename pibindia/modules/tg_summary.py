@@ -1,4 +1,7 @@
 import os
+import time
+import requests
+from scrapy.selector import Selector
 from llama_cpp import Llama
 import re
 
@@ -19,13 +22,21 @@ def escape_md(text):
     return re.sub(r"([_*\[\]()~`>#+\-=|{}.!])", r"\\\1", text)
 
 
-def summarize_text(text):
-    prompt = f"""
+def summarize_text(text, max_chunk_tokens=1500):
+    # Split text into words for chunking
+    words = text.split()
+    chunks = []
+    for i in range(0, len(words), max_chunk_tokens):
+        chunks.append(" ".join(words[i : i + max_chunk_tokens]))
+
+    summaries = []
+    for chunk in chunks:
+        prompt = f"""
 Summarize ONLY the provided PIB press release text.
 
 🎯 Guidelines:
 - Write for UPSC and other competitive exams.
-- Keep it very precise and very concise, factual, and to the point.
+- Keep it very precise and concise, factual, and to the point.
 - Ignore all external links, references, or other PIB releases.
 - DO NOT include unrelated or speculative information.
 - Focus strictly on the provided text content.
@@ -37,13 +48,17 @@ Summarize ONLY the provided PIB press release text.
 • Avoid repetition or unnecessary words.
 • Maintain neutral, official tone.
 
-Output must be short very precise and very concise , clear, and ready to post.
+Output must be short, very precise, and ready to post.
 
 Text:
-{text}
+{chunk}
 """
-    result = llm(prompt, max_tokens=350, temperature=0.3, top_p=0.95)
-    return result["choices"][0]["text"].strip()
+        result = llm(prompt, max_tokens=350, temperature=0.3, top_p=0.95)
+        summaries.append(result["choices"][0]["text"].strip())
+
+    # Combine all chunk summaries into final summary
+    final_summary = " ".join(summaries)
+    return final_summary
 
 
 def post_to_telegram(message):

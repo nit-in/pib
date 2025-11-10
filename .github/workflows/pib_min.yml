@@ -184,7 +184,6 @@ jobs:
       - name: run script
         run:  |
           source .env
-          export SUMMARY="True"
           echo $(pwd)
           pib_min ${{ inputs.intialDate }} ${{ inputs.lastDate }} ${{ inputs.ministrycode }} || err_handle "10" "Spider failed to run"
 
