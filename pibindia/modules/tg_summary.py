@@ -17,20 +17,35 @@ llm = Llama(
     verbose=False,
 )
 
-
 def escape_md(text):
     return re.sub(r"([_*\[\]()~`>#+\-=|{}.!])", r"\\\1", text)
 
+def count_tokens(text):
+    return len(llm.tokenize(text.encode("utf-8")))
+
+def split_text_by_tokens(text, max_tokens = 1500):
+    tokens = llm.tokenize(text.encode("utf-8"))
+    chunks = []
+    start = 0
+    while start < len(tokens):
+        end = start + max_tokens
+        chunk = llm.detokenize(tokens[start:end]).decode("utf-8", errors="ignore")
+        chunks.append(chunk)
+        start = end
+    return chunks
 
 def summarize_text(text, max_chunk_tokens=1500):
-    # Split text into words for chunking
-    words = text.split()
-    chunks = []
-    for i in range(0, len(words), max_chunk_tokens):
-        chunks.append(" ".join(words[i : i + max_chunk_tokens]))
+    # Token-safe chunking
+    token_count = count_tokens(text)
+    print(f"Total token count: {token_count}")
+    if token_count > max_chunk_tokens:
+        chunks = split_text_by_tokens(text, max_chunk_tokens)
+    else:
+        chunks = [text]
 
     summaries = []
-    for chunk in chunks:
+    for i, chunk in enumerate(chunks, 1):
+        print(f"Processing chunk {i}/{len(chunks)} ({count_tokens(chunk)} tokens)")
         prompt = f"""
 Summarize ONLY the provided PIB press release text.
 
@@ -59,7 +74,6 @@ Text:
     # Combine all chunk summaries into final summary
     final_summary = " ".join(summaries)
     return final_summary
-
 
 def post_to_telegram(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
