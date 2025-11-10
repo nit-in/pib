@@ -149,6 +149,4 @@ class PibSpider(scrapy.Spider):
             if check_file(pdf_path):
                 summary_post = summarize_text(art_data)
                 post_to_telegram(summary_post)
-
-        if not os.getenv("ONLY_JSON"):
-            download_article(pdf_path, art_link)
+        download_article(pdf_path, art_link)
