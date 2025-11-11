@@ -18,12 +18,15 @@ llm = Llama(
 )
 
 def escape_md(text):
-    return re.sub(r"([_*\[\]()~`>#+\-=|{}.!])", r"\\\1", text)
+    return re.sub(r"([_*\[\]()~`>#+\\-=|{}.!])", r"\\\1", text)
 
 def count_tokens(text):
     return len(llm.tokenize(text.encode("utf-8")))
 
-def split_text_by_tokens(text, max_tokens = 1500):
+def clean_text(text):
+    return re.sub(r"(Click here.*|For more information.*)", "", text, flags=re.I)
+
+def split_text_by_tokens(text, max_tokens=1500):
     tokens = llm.tokenize(text.encode("utf-8"))
     chunks = []
     start = 0
@@ -34,10 +37,24 @@ def split_text_by_tokens(text, max_tokens = 1500):
         start = end
     return chunks
 
-def summarize_text(text, max_chunk_tokens=1500):
-    # Token-safe chunking
+def safe_llm_call(prompt, max_tokens, retries=3):
+    for attempt in range(retries):
+        try:
+            return llm(prompt, max_tokens=max_tokens, temperature=0.3, top_p=0.95)
+        except Exception as e:
+            print(f"LLM error (attempt {attempt+1}): {e}")
+            time.sleep(2)
+    return {"choices": [{"text": ""}]}
+
+def summarize_text(text, max_chunk_tokens=None):
+    text = clean_text(text)
     token_count = count_tokens(text)
     print(f"Total token count: {token_count}")
+
+    # Auto-adjust chunk size based on model context
+    if max_chunk_tokens is None:
+        max_chunk_tokens = int(llm.n_ctx * 0.75)
+
     if token_count > max_chunk_tokens:
         chunks = split_text_by_tokens(text, max_chunk_tokens)
     else:
@@ -45,7 +62,10 @@ def summarize_text(text, max_chunk_tokens=1500):
 
     summaries = []
     for i, chunk in enumerate(chunks, 1):
-        print(f"Processing chunk {i}/{len(chunks)} ({count_tokens(chunk)} tokens)")
+        chunk_tokens = count_tokens(chunk)
+        max_summary_tokens = min(int(chunk_tokens * 0.25), 512)
+        print(f"Processing chunk {i}/{len(chunks)} ({chunk_tokens} tokens) → summary cap: {max_summary_tokens}")
+
         prompt = f"""
 Summarize ONLY the provided PIB press release text.
 
@@ -68,11 +88,13 @@ Output must be short, very precise, and ready to post.
 Text:
 {chunk}
 """
-        result = llm(prompt, max_tokens=350, temperature=0.3, top_p=0.95)
+        result = safe_llm_call(prompt, max_summary_tokens)
         summaries.append(result["choices"][0]["text"].strip())
 
-    # Combine all chunk summaries into final summary
+        time.sleep(1)
+
     final_summary = " ".join(summaries)
+    print(f"Final summary length: {count_tokens(final_summary)} tokens")
     return final_summary
 
 def post_to_telegram(message):
